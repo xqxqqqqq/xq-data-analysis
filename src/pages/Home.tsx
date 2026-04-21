@@ -5,10 +5,10 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 顶部头部区域 */}
-      <div className="bg-green-50 py-16 mb-12">
+      <div className="bg-green-50 py-12 mb-8">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl font-bold mb-6 text-gray-800">
+            <h1 className="text-4xl font-bold mb-4 text-gray-800">
               数据分析技术实战项目
             </h1>
             <p className="text-lg text-gray-600 leading-relaxed">
@@ -20,25 +20,25 @@ const Home = () => {
       
       {/* 项目卡片列表 */}
       <div className="container mx-auto px-4 pb-20">
-        <div className="grid grid-cols-2 gap-10">
+        <div className="grid grid-cols-2 gap-8">
           {projects.map((project) => (
             <Link 
               key={project.id} 
               to={`/project/${project.id}`}
               className="block group h-full"
             >
-              <div className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 h-full flex flex-col">
-                <div className="flex mb-4">
-                  <div className="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center mr-3 flex-shrink-0">
+              <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 h-full flex flex-col">
+                <div className="flex mb-6">
+                  <div className="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center mr-4 flex-shrink-0">
                     {project.id}
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800">
+                  <div className="flex-grow">
+                    <h3 className="text-xl font-bold text-gray-800 leading-tight">
                       {project.title}
                     </h3>
                   </div>
                 </div>
-                <p className="text-gray-600 mb-6 leading-relaxed text-base flex-grow">
+                <p className="text-gray-600 mb-8 leading-relaxed text-base flex-grow">
                   {project.description}
                 </p>
                 <div className="flex justify-end">
