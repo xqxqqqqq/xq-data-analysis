@@ -112,11 +112,12 @@ export default function CodeEditor({
     });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Tab') {
       e.preventDefault();
-      const start = e.currentTarget.selectionStart;
-      const end = e.currentTarget.selectionEnd;
+      const target = e.currentTarget as HTMLTextAreaElement;
+      const start = target.selectionStart;
+      const end = target.selectionEnd;
       const newCode = code.substring(0, start) + '    ' + code.substring(end);
       setCode(newCode);
       setTimeout(() => {
