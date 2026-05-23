@@ -1,0 +1,7 @@
+order_id,customer_id,product_id,quantity,unit_price,order_date,status,customer_name,email,level,region,product_name,category,brand,cost_price,stock
+1001,2001,3001,2,459.00,2024-01-01,完成,客户2001,customer2001@example.com,VIP,华北,产品3001,电子产品,品牌A,280.00,150
+1002,2002,3002,3,129.90,2024-01-01,完成,客户2002,customer2002@example.com,普通,华东,产品3002,服装,品牌B,65.00,200
+1003,2003,3003,5,45.50,2024-01-01,待发货,客户2003,customer2003@example.com,银卡,华南,产品3003,食品,品牌C,25.00,500
+1004,2004,3004,1,899.00,2024-01-02,完成,客户2004,customer2004@example.com,金卡,华东,产品3004,电子产品,品牌D,520.00,80
+1005,2005,3005,2,299.00,2024-01-02,已取消,客户2005,customer2005@example.com,普通,华北,产品3005,家居,品牌A,180.00,120
+1006,2006,3006,4,89.90,2024-01-02,完成,客户2006,customer2006@example.com,银卡,华南,产品3006,服装,品牌B,45.00,250

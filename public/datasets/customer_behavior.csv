@@ -1,0 +1,16 @@
+user_id,visit_date,channel,page_views,duration_minutes,bounce_rate,add_to_cart,purchase,avg_order_value,device_type
+U001,2024-01-01,organic,5,8.5,0.2,1,1,299.00,desktop
+U002,2024-01-01,social,3,4.2,0.5,0,0,0,mobile
+U003,2024-01-01,direct,10,15.3,0.1,2,1,459.00,desktop
+U004,2024-01-02,paid,8,12.1,0.15,1,1,199.00,mobile
+U005,2024-01-02,organic,4,6.8,0.3,0,0,0,tablet
+U006,2024-01-02,social,6,9.5,0.25,1,0,0,mobile
+U007,2024-01-03,direct,12,18.7,0.08,3,1,699.00,desktop
+U008,2024-01-03,paid,7,11.2,0.18,2,1,349.00,mobile
+U009,2024-01-03,organic,2,3.5,0.6,0,0,0,desktop
+U010,2024-01-04,social,5,7.9,0.22,1,1,129.00,mobile
+U011,2024-01-04,direct,9,14.5,0.12,2,1,599.00,desktop
+U012,2024-01-04,paid,4,5.6,0.35,0,0,0,tablet
+U013,2024-01-05,organic,6,10.2,0.19,1,1,249.00,mobile
+U014,2024-01-05,social,3,4.8,0.45,0,0,0,mobile
+U015,2024-01-05,direct,15,22.3,0.05,4,1,899.00,desktop

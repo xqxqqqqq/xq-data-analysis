@@ -7,6 +7,7 @@ export interface Project {
   tools: string[];
   learningPoints: string[];
   overview: string;
+  duration: string;
   prerequisites: {
     tools: string[];
     datasets: string[];
@@ -15,585 +16,781 @@ export interface Project {
     title: string;
     content: string;
     code?: string;
+    tools?: string[];
+    functions?: string[];
   }[];
   practiceTasks: string[];
   practiceTaskAnswers: string[];
   practiceTaskLinks?: string[];
   assessment: string[];
   assessmentAnswers: string[];
+  dataset?: {
+    filename: string;
+    name: string;
+    size: string;
+    desc: string;
+  };
+  script?: {
+    filename: string;
+    name: string;
+    size: string;
+    desc: string;
+  };
 }
-
 export const projects: Project[] = [
   {
     id: 1,
-    title: "数据感知与基础处理",
-    description: "掌握数据导入、清洗和基础统计分析",
-    goal: "通过处理泰坦尼克号数据集，学习数据读取、缺失值处理、数据类型转换和描述性统计等基础技能",
-    dataSource: "Kaggle的泰坦尼克号数据集",
+    title: "电商订单数据清洗",
+    description: "学习数据清洗的核心技巧",
+    goal: "通过处理电商订单数据集，掌握数据导入、缺失值处理、异常值检测和数据标准化等数据清洗技能",
+    dataSource: "电商订单数据集",
     tools: ["Python", "Pandas", "NumPy"],
     learningPoints: [
       "数据读取和导入",
       "缺失值检测与处理",
+      "异常值识别和处理",
       "数据类型转换",
-      "描述性统计分析",
-      "数据筛选和排序"
+      "数据去重和标准化"
     ],
-    overview: "本项目将带你使用Python的Pandas和NumPy库处理泰坦尼克号数据集，学习数据分析的基础操作。通过本项目的学习，你将掌握数据读取、缺失值处理、数据类型转换和描述性统计分析等核心技能，为后续的数据分析项目打下坚实基础。",
+    overview: "本项目将带你使用Python的Pandas库处理电商订单数据集，学习数据清洗的完整流程。通过本项目的学习，你将掌握数据读取、缺失值处理、异常值检测和数据标准化等核心技能，为后续的数据分析打下坚实基础。",
+    duration: "30分钟",
     prerequisites: {
-      tools: ["Python 3.7+", "Jupyter Notebook", "Pandas", "NumPy"],
-      datasets: ["Kaggle泰坦尼克号数据集: https://www.kaggle.com/c/titanic/data"]
+      tools: ["无前置要求，本项目会从零开始讲解"],
+      datasets: ["项目已内置模拟数据，无需额外下载"]
     },
     stepByStep: [
       {
-        title: "步骤1：环境搭建",
-        content: "首先需要安装必要的Python库。打开命令行或终端，运行以下命令安装Pandas和NumPy：",
-        code: "pip install pandas numpy jupyter"
+        title: "步骤1：创建模拟数据",
+        content: "创建一个模拟的电商订单数据集，包括订单ID、客户ID、产品类别、数量、价格、日期和地区等字段，并人为添加一些缺失值和异常值用于后续练习。",
+        code: "import pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 101),\n    'customer_id': np.random.randint(1001, 1020, 100),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 100),\n    'quantity': np.random.randint(1, 10, 100),\n    'price': np.random.uniform(10, 500, 100).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=100, freq='D'),\n    'region': np.random.choice(['华北', '华东', '华南', '西南', '西北'], 100)\n}\n\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\n# 人为添加一些缺失值和异常值\norders_df.loc[np.random.choice(100, 10), 'quantity'] = np.nan\norders_df.loc[np.random.choice(100, 5), 'price'] = np.nan\norders_df.loc[np.random.choice(100, 3), 'quantity'] = 100  # 异常值\n\nprint('数据创建完成！')\nprint(f'数据形状: {orders_df.shape}')\nprint('\\n前5行数据:')\nprint(orders_df.head())",
+        tools: ["pandas", "numpy"],
+        functions: ["pd.DataFrame()", "np.random.seed()", "np.random.randint()", "np.random.choice()", "np.random.uniform()", "pd.date_range()", "df.loc[]"]
       },
       {
-        title: "步骤2：数据读取",
-        content: "使用Pandas读取CSV格式的泰坦尼克号数据集：",
-        code: "import pandas as pd\n\n# 读取数据\ndf = pd.read_csv('titanic.csv')\n\n# 查看数据前5行\nprint(df.head())"
+        title: "步骤2：数据质量检查",
+        content: "检查数据的基本信息和质量问题，包括数据形状、数据类型、缺失值、重复值和数值统计信息。",
+        code: "import pandas as pd\nimport numpy as np\n\n# 重新创建数据（独立运行）\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 101),\n    'customer_id': np.random.randint(1001, 1020, 100),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 100),\n    'quantity': np.random.randint(1, 10, 100),\n    'price': np.random.uniform(10, 500, 100).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=100, freq='D'),\n    'region': np.random.choice(['华北', '华东', '华南', '西南', '西北'], 100)\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\norders_df.loc[np.random.choice(100, 10), 'quantity'] = np.nan\norders_df.loc[np.random.choice(100, 5), 'price'] = np.nan\norders_df.loc[np.random.choice(100, 3), 'quantity'] = 100\n\n# 查看数据形状\nprint('数据形状:', orders_df.shape)\n\n# 查看数据信息\nprint('\\n数据信息:')\norders_df.info()\n\n# 查看缺失值\nprint('\\n缺失值统计:')\nprint(orders_df.isnull().sum())\n\n# 查看重复值\nprint('\\n重复值数量:', orders_df.duplicated().sum())\n\n# 查看数值型数据的统计信息\nprint('\\n数值型数据统计:')\nprint(orders_df.describe())",
+        tools: ["pandas"],
+        functions: ["df.shape", "df.info()", "df.isnull()", "df.duplicated()", "df.describe()"]
       },
       {
-        title: "步骤3：数据探索",
-        content: "了解数据集的基本信息，包括数据形状、列名、数据类型等：",
-        code: "# 查看数据形状\nprint('数据形状:', df.shape)\n\n# 查看列名\nprint('列名:', df.columns.tolist())\n\n# 查看数据类型\nprint('数据类型:')\nprint(df.dtypes)\n\n# 查看基本统计信息\nprint('基本统计信息:')\nprint(df.describe())"
+        title: "步骤3：缺失值处理",
+        content: "处理数据中的缺失值，对于数值型列使用中位数填充，这是一种常用的缺失值处理方法，可以避免极端值的影响。",
+        code: "import pandas as pd\nimport numpy as np\n\n# 重新创建数据（独立运行）\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 101),\n    'customer_id': np.random.randint(1001, 1020, 100),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 100),\n    'quantity': np.random.randint(1, 10, 100),\n    'price': np.random.uniform(10, 500, 100).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=100, freq='D'),\n    'region': np.random.choice(['华北', '华东', '华南', '西南', '西北'], 100)\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\norders_df.loc[np.random.choice(100, 10), 'quantity'] = np.nan\norders_df.loc[np.random.choice(100, 5), 'price'] = np.nan\n\nprint('处理前缺失值统计:')\nprint(orders_df.isnull().sum())\n\n# 对于数值型列，用中位数填充\nnumeric_cols = orders_df.select_dtypes(include=[np.number]).columns\nfor col in numeric_cols:\n    if orders_df[col].isnull().sum() > 0:\n        orders_df[col].fillna(orders_df[col].median(), inplace=True)\n\n# 再次检查缺失值\nprint('\\n处理后缺失值统计:')\nprint(orders_df.isnull().sum())",
+        tools: ["pandas", "numpy"],
+        functions: ["df.select_dtypes()", "df.fillna()", "df.median()", "df.isnull()"]
       },
       {
-        title: "步骤4：缺失值检测与处理",
-        content: "检测数据中的缺失值并进行处理：",
-        code: "# 检测缺失值\nprint('缺失值统计:')\nprint(df.isnull().sum())\n\n# 处理缺失值\n# 对于Age列，使用平均值填充\ndf['Age'].fillna(df['Age'].mean(), inplace=True)\n\n# 对于Embarked列，使用众数填充\ndf['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)\n\n# 对于Cabin列，由于缺失值较多，直接删除该列\ndf.drop('Cabin', axis=1, inplace=True)\n\n# 再次检查缺失值\nprint('处理后缺失值统计:')\nprint(df.isnull().sum())"
+        title: "步骤4：异常值检测",
+        content: "使用IQR（四分位距）方法检测和处理异常值。IQR方法是一种稳健的异常值检测方法，不受极端值影响。",
+        code: "import pandas as pd\nimport numpy as np\n\n# 重新创建数据（独立运行）\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 101),\n    'customer_id': np.random.randint(1001, 1020, 100),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 100),\n    'quantity': np.random.randint(1, 10, 100),\n    'price': np.random.uniform(10, 500, 100).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=100, freq='D'),\n    'region': np.random.choice(['华北', '华东', '华南', '西南', '西北'], 100)\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\norders_df.loc[np.random.choice(100, 10), 'quantity'] = np.nan\norders_df.loc[np.random.choice(100, 5), 'price'] = np.nan\norders_df.loc[np.random.choice(100, 3), 'quantity'] = 100\n\n# 填充缺失值\nnumeric_cols = orders_df.select_dtypes(include=[np.number]).columns\nfor col in numeric_cols:\n    if orders_df[col].isnull().sum() > 0:\n        orders_df[col].fillna(orders_df[col].median(), inplace=True)\n\nprint('处理前数据统计:')\nprint(orders_df[['quantity', 'price', 'amount']].describe())\n\n# 对数值型列进行异常值检测\nfor col in ['quantity', 'price', 'amount']:\n    Q1 = orders_df[col].quantile(0.25)\n    Q3 = orders_df[col].quantile(0.75)\n    IQR = Q3 - Q1\n    lower_bound = Q1 - 1.5 * IQR\n    upper_bound = Q3 + 1.5 * IQR\n    \n    # 替换异常值为上下限\n    orders_df[col] = np.where(orders_df[col] < lower_bound, lower_bound, orders_df[col])\n    orders_df[col] = np.where(orders_df[col] > upper_bound, upper_bound, orders_df[col])\n\nprint('\\n异常值处理完成！')\nprint('\\n处理后数据统计:')\nprint(orders_df[['quantity', 'price', 'amount']].describe())",
+        tools: ["pandas", "numpy"],
+        functions: ["df.quantile()", "np.where()"]
       },
       {
-        title: "步骤5：数据类型转换",
-        content: "将必要的列转换为合适的数据类型：",
-        code: "# 查看当前数据类型\nprint('当前数据类型:')\nprint(df.dtypes)\n\n# 将Sex列转换为分类类型\ndf['Sex'] = df['Sex'].astype('category')\n\n# 将Embarked列转换为分类类型\ndf['Embarked'] = df['Embarked'].astype('category')\n\n# 将Survived列转换为分类类型\ndf['Survived'] = df['Survived'].astype('category')\n\n# 查看转换后的数据类型\nprint('转换后数据类型:')\nprint(df.dtypes)"
-      },
-      {
-        title: "步骤6：描述性统计分析",
-        content: "对数据进行描述性统计分析，了解数据的分布特征：",
-        code: "# 数值型数据的描述性统计\nprint('数值型数据统计:')\nprint(df.describe())\n\n# 分类变量的统计\nprint('\\n分类变量统计:')\nprint(df['Sex'].value_counts())\nprint('\\n', df['Embarked'].value_counts())\nprint('\\n', df['Survived'].value_counts())"
-      },
-      {
-        title: "步骤7：数据筛选和排序",
-        content: "学习如何根据条件筛选数据和排序：",
-        code: "# 筛选幸存的乘客\nsurvived_passengers = df[df['Survived'] == 1]\nprint('幸存乘客数量:', len(survived_passengers))\n\n# 筛选年龄大于30岁的乘客\nage_above_30 = df[df['Age'] > 30]\nprint('年龄大于30岁的乘客数量:', len(age_above_30))\n\n# 按年龄排序\nsorted_by_age = df.sort_values('Age', ascending=False)\nprint('\\n按年龄降序排序前5名:')\nprint(sorted_by_age.head())\n\n# 按票价和年龄排序\nsorted_by_fare_age = df.sort_values(['Fare', 'Age'], ascending=[False, True])\nprint('\\n按票价降序、年龄升序排序前5名:')\nprint(sorted_by_fare_age.head())"
+        title: "步骤5：数据标准化",
+        content: "对数据进行去重和标准化处理，删除重复记录，统一文本格式，确保数据的一致性和准确性。",
+        code: "import pandas as pd\nimport numpy as np\n\n# 重新创建数据（独立运行）\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 101),\n    'customer_id': np.random.randint(1001, 1020, 100),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 100),\n    'quantity': np.random.randint(1, 10, 100),\n    'price': np.random.uniform(10, 500, 100).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=100, freq='D'),\n    'region': np.random.choice(['华北', '华东', '华南', '西南', '西北'], 100)\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\norders_df.loc[np.random.choice(100, 10), 'quantity'] = np.nan\norders_df.loc[np.random.choice(100, 5), 'price'] = np.nan\norders_df.loc[np.random.choice(100, 3), 'quantity'] = 100\n\n# 填充缺失值\nnumeric_cols = orders_df.select_dtypes(include=[np.number]).columns\nfor col in numeric_cols:\n    if orders_df[col].isnull().sum() > 0:\n        orders_df[col].fillna(orders_df[col].median(), inplace=True)\n\n# 处理异常值\nfor col in ['quantity', 'price', 'amount']:\n    Q1 = orders_df[col].quantile(0.25)\n    Q3 = orders_df[col].quantile(0.75)\n    IQR = Q3 - Q1\n    lower_bound = Q1 - 1.5 * IQR\n    upper_bound = Q3 + 1.5 * IQR\n    orders_df[col] = np.where(orders_df[col] < lower_bound, lower_bound, orders_df[col])\n    orders_df[col] = np.where(orders_df[col] > upper_bound, upper_bound, orders_df[col])\n\n# 删除重复值（如果有）\norders_df.drop_duplicates(inplace=True)\n\n# 文本列统一格式\nif 'product_category' in orders_df.columns:\n    orders_df['product_category'] = orders_df['product_category'].str.strip()\n\nprint('数据清洗完成！')\nprint('最终数据形状:', orders_df.shape)\nprint('\\n清洗后数据预览:')\nprint(orders_df.head())",
+        tools: ["pandas"],
+        functions: ["df.drop_duplicates()", "df.str.strip()"]
       }
     ],
     practiceTasks: [
-      "1. 统计泰坦尼克号上不同舱位（Pclass）的乘客数量和幸存率",
-      "2. 分析年龄与幸存率之间的关系，绘制年龄分布直方图",
-      "3. 计算不同性别的乘客的平均票价和幸存率"
+      "1. 统计每个产品类别的订单数量和平均金额",
+      "2. 找出订单金额最高的前10个客户",
+      "3. 分析订单日期的分布情况"
     ],
     practiceTaskAnswers: [
-      "# 练习1答案\nimport pandas as pd\n\n# 读取数据\ndf = pd.read_csv('titanic.csv')\n\n# 统计不同舱位的乘客数量和幸存率\npclass_stats = df.groupby('Pclass').agg({\n    'PassengerId': 'count',\n    'Survived': 'mean'\n}).round(4)\n\npclass_stats.columns = ['乘客数量', '幸存率']\npclass_stats['幸存率'] = pclass_stats['幸存率'] * 100\n\nprint('不同舱位的乘客数量和幸存率:')\nprint(pclass_stats)\n",
-      "# 练习2答案\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\n# 读取数据\ndf = pd.read_csv('titanic.csv')\n\n# 分析年龄与幸存率的关系\nage_survival = df.groupby(pd.cut(df['Age'], bins=10)).agg({\n    'Survived': 'mean'\n}).round(4)\n\nage_survival['幸存率'] = age_survival['Survived'] * 100\n\n# 绘制年龄分布直方图\nplt.figure(figsize=(12, 6))\nplt.subplot(1, 2, 1)\ndf['Age'].plot(kind='hist', bins=30, alpha=0.7)\nplt.title('年龄分布')\nplt.xlabel('年龄')\nplt.ylabel('人数')\n\n# 绘制年龄与幸存率关系\nplt.subplot(1, 2, 2)\nage_survival['幸存率'].plot(kind='bar', alpha=0.7)\nplt.title('年龄与幸存率关系')\nplt.xlabel('年龄区间')\nplt.ylabel('幸存率 (%)')\nplt.xticks(rotation=45)\n\nplt.tight_layout()\nplt.show()\n",
-      "# 练习3答案\nimport pandas as pd\n\n# 读取数据\ndf = pd.read_csv('titanic.csv')\n\n# 计算不同性别的乘客的平均票价和幸存率\ngender_stats = df.groupby('Sex').agg({\n    'Fare': 'mean',\n    'Survived': 'mean'\n}).round(4)\n\ngender_stats.columns = ['平均票价', '幸存率']\ngender_stats['幸存率'] = gender_stats['幸存率'] * 100\n\nprint('不同性别的乘客统计:')\nprint(gender_stats)\n"
-    ],
-    practiceTaskLinks: [
-      "https://www.kaggle.com/c/titanic/overview",
-      "https://www.datacamp.com/community/tutorials/pandas-tutorial-dataframe-python",
-      "https://www.w3schools.com/python/pandas/default.asp"
+      "# 练习1答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 101),\n    'customer_id': np.random.randint(1001, 1020, 100),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 100),\n    'quantity': np.random.randint(1, 10, 100),\n    'price': np.random.uniform(10, 500, 100).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=100, freq='D')\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\n# 统计每个产品类别的订单数量和平均金额\nif 'product_category' in orders_df.columns and 'amount' in orders_df.columns:\n    category_stats = orders_df.groupby('product_category').agg({\n        'order_id': 'count',\n        'amount': 'mean'\n    }).round(2)\n    \n    category_stats.columns = ['订单数量', '平均金额']\n    print('产品类别统计:')\n    print(category_stats)\n",
+      "# 练习2答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 101),\n    'customer_id': np.random.randint(1001, 1020, 100),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 100),\n    'quantity': np.random.randint(1, 10, 100),\n    'price': np.random.uniform(10, 500, 100).round(2)\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\n# 找出订单金额最高的前10个客户\nif 'customer_id' in orders_df.columns and 'amount' in orders_df.columns:\n    top_customers = orders_df.groupby('customer_id')['amount'].sum()\\\n        .sort_values(ascending=False).head(10)\n    \n    print('订单金额最高的前10个客户:')\n    print(top_customers)\n",
+      "# 练习3答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 101),\n    'order_date': pd.date_range(start='2024-01-01', periods=100, freq='D'),\n    'quantity': np.random.randint(1, 10, 100),\n    'price': np.random.uniform(10, 500, 100).round(2)\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\n# 分析订单日期的分布\nif 'order_date' in orders_df.columns:\n    orders_df['order_date'] = pd.to_datetime(orders_df['order_date'])\n    orders_df['month'] = orders_df['order_date'].dt.to_period('M')\n    \n    monthly_orders = orders_df.groupby('month').size()\n    \n    print('月度订单分布:')\n    print(monthly_orders)\n"
     ],
     assessment: [
-      "1. 如何检测数据中的缺失值？请写出相关代码",
-      "2. 简述Pandas中fillna()和dropna()方法的区别，分别在什么情况下使用？"
+      "1. 数据清洗的主要步骤有哪些？请简述",
+      "2. 简述IQR方法检测异常值的原理"
     ],
     assessmentAnswers: [
-      "检测数据中的缺失值可以使用Pandas的isnull()或isna()方法，结合sum()函数来统计每列的缺失值数量：\n\n```python\nimport pandas as pd\n\n# 读取数据\ndf = pd.read_csv('titanic.csv')\n\n# 检测缺失值\nprint('缺失值统计:')\nprint(df.isnull().sum())\n\n# 也可以使用info()方法查看非空值数量\nprint('\\n数据信息:')\ndf.info()\n```",
-      "- fillna()方法：用于填充缺失值，可以指定填充值（如均值、中位数、众数等）。适用于：\n  1. 缺失值比例较小且对数据分布影响不大时\n  2. 有合理的填充值（如用均值填充数值型数据）\n  3. 需要保留所有数据行时\n\n- dropna()方法：用于删除包含缺失值的行或列。适用于：\n  1. 缺失值比例较大且无法合理填充时\n  2. 缺失值对分析结果影响较大时\n  3. 数据量充足，删除少量缺失值不影响分析时"
-    ]
+      "数据清洗的主要步骤包括：\\n1. 数据质量检查：查看数据形状、类型、缺失值、重复值等\\n2. 缺失值处理：用均值/中位数/众数填充或删除\\n3. 异常值检测：用IQR、Z-score等方法识别\\n4. 数据去重：删除重复的记录\\n5. 数据标准化：统一日期格式、文本格式等",
+      "IQR（四分位距）方法检测异常值的原理：\\n1. 计算Q1（第25百分位数）和Q3（第75百分位数）\\n2. 计算IQR = Q3 - Q1\\n3. 定义异常值范围：小于Q1 - 1.5*IQR 或 大于Q3 + 1.5*IQR\\n4. 超出这个范围的数据被认为是异常值"
+    ],
+    dataset: {
+      filename: "project1_orders.csv",
+      name: "项目1 - 电商订单数据",
+      size: "1.2KB",
+      desc: "电商订单数据，包含订单ID、客户ID、产品类别、数量、价格、日期、地区等"
+    }
   },
   {
     id: 2,
-    title: "数据可视化基础",
-    description: "学习使用不同图表类型展示数据",
-    goal: "通过销售数据或人口统计数据，掌握各种图表的应用场景和绘制方法",
-    dataSource: "销售数据或人口统计数据",
-    tools: ["Matplotlib", "Seaborn"],
+    title: "销售数据分组分析",
+    description: "掌握数据分组和聚合分析",
+    goal: "通过销售数据的分组聚合分析，学习groupby操作、多重索引和透视表等高级技巧",
+    dataSource: "电商销售数据集",
+    tools: ["Python", "Pandas"],
     learningPoints: [
-      "折线图的绘制和应用",
-      "柱状图的绘制和应用",
-      "饼图的绘制和应用",
-      "散点图的绘制和应用",
-      "图表美化和定制"
+      "groupby基础操作",
+      "多重分组和聚合",
+      "透视表和交叉表",
+      "窗口函数",
+      "数据聚合优化"
     ],
-    overview: "本项目将带你学习使用Matplotlib和Seaborn库创建各种数据可视化图表。通过本项目的学习，你将掌握折线图、柱状图、饼图、散点图等常见图表的绘制方法，以及如何美化和定制图表，使数据更直观、更有说服力。",
+    overview: "本项目将带你深入学习Pandas的分组聚合功能。通过分析电商销售数据，你将掌握groupby操作、多重索引、透视表等高级技巧，能够快速从复杂数据中提取有价值的信息。",
+    duration: "30分钟",
     prerequisites: {
-      tools: ["Python 3.7+", "Jupyter Notebook", "Pandas", "NumPy", "Matplotlib", "Seaborn"],
-      datasets: ["销售数据示例: https://www.kaggle.com/datasets/kyanyoga/sample-sales-data", "人口统计数据: https://www.kaggle.com/datasets/census/population-by-country-2020"]
+      tools: ["无前置要求，本项目会从零开始讲解"],
+      datasets: ["项目已内置模拟数据，无需额外下载"]
     },
     stepByStep: [
       {
-        title: "步骤1：环境搭建",
-        content: "安装必要的Python库：",
-        code: "pip install pandas numpy matplotlib seaborn jupyter"
+        title: "步骤1：创建模拟数据",
+        content: "创建一个模拟的电商销售数据集：",
+        code: "import pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 201),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 200),\n    'region': np.random.choice(['华北', '华东', '华南', '西南'], 200),\n    'quantity': np.random.randint(1, 10, 200),\n    'price': np.random.uniform(10, 500, 200).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=200, freq='D'),\n    'product_name': np.random.choice(['商品A', '商品B', '商品C', '商品D', '商品E'], 200)\n}\n\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\nprint('数据创建完成！')\nprint(f'数据形状: {orders_df.shape}')\nprint('\\n前5行数据:')\nprint(orders_df.head())"
       },
       {
-        title: "步骤2：数据准备",
-        content: "导入必要的库并准备示例数据：",
-        code: "import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 设置中文字体\nplt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签\nplt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号\n\n# 创建示例销售数据\ndates = pd.date_range('2023-01-01', periods=12, freq='M')\nsales = np.random.randint(1000, 5000, size=12)\nsales_data = pd.DataFrame({'日期': dates, '销售额': sales})\n\n# 创建示例人口统计数据\ncountries = ['中国', '印度', '美国', '印度尼西亚', '巴基斯坦']\npopulation = [1412, 1380, 331, 273, 220]  # 单位：百万\npopulation_data = pd.DataFrame({'国家': countries, '人口': population})\n\n# 创建示例散点图数据\nx = np.random.randn(100)\ny = 2 * x + np.random.randn(100) * 0.5\nscatter_data = pd.DataFrame({'x': x, 'y': y})"
+        title: "步骤2：基础分组",
+        content: "学习基本的groupby操作：",
+        code: "import pandas as pd\nimport numpy as np\n\n# 创建模拟数据（独立运行）\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 201),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 200),\n    'region': np.random.choice(['华北', '华东', '华南', '西南'], 200),\n    'quantity': np.random.randint(1, 10, 200),\n    'price': np.random.uniform(10, 500, 200).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=200, freq='D'),\n    'product_name': np.random.choice(['商品A', '商品B', '商品C', '商品D', '商品E'], 200)\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\n# 按产品类别分组\nif 'product_category' in orders_df.columns:\n    category_group = orders_df.groupby('product_category')\n    \n    # 计算每组的统计量\n    print('产品类别统计:')\n    print(category_group.size())\n    \n    if 'amount' in orders_df.columns:\n        print('\\n平均订单金额:')\n        print(category_group['amount'].mean().round(2))"
       },
       {
-        title: "步骤3：折线图的绘制和应用",
-        content: "折线图适合展示时间序列数据的变化趋势：",
-        code: "# 绘制折线图\nplt.figure(figsize=(10, 6))\nplt.plot(sales_data['日期'], sales_data['销售额'], marker='o', linestyle='-', color='green')\nplt.title('月度销售额趋势')\nplt.xlabel('日期')\nplt.ylabel('销售额')\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()"
+        title: "步骤3：多重聚合",
+        content: "同时计算多个统计量：",
+        code: "import pandas as pd\nimport numpy as np\n\n# 创建模拟数据（独立运行）\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 201),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 200),\n    'quantity': np.random.randint(1, 10, 200),\n    'price': np.random.uniform(10, 500, 200).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=200, freq='D')\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\n# 多重聚合\nif 'product_category' in orders_df.columns and 'amount' in orders_df.columns:\n    agg_result = orders_df.groupby('product_category').agg({\n        'order_id': 'count',\n        'amount': ['mean', 'sum', 'min', 'max']\n    }).round(2)\n    \n    print('多重聚合结果:')\n    print(agg_result)"
       },
       {
-        title: "步骤4：柱状图的绘制和应用",
-        content: "柱状图适合比较不同类别的数据：",
-        code: "# 绘制柱状图\nplt.figure(figsize=(10, 6))\nsns.barplot(x='国家', y='人口', data=population_data, palette='viridis')\nplt.title('各国人口数量')\nplt.xlabel('国家')\nplt.ylabel('人口（百万）')\nplt.xticks(rotation=45)\nplt.tight_layout()\nplt.show()"
+        title: "步骤4：透视表",
+        content: "使用pivot_table创建透视表：",
+        code: "import pandas as pd\nimport numpy as np\n\n# 创建模拟数据（独立运行）\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 201),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 200),\n    'region': np.random.choice(['华北', '华东', '华南', '西南'], 200),\n    'quantity': np.random.randint(1, 10, 200),\n    'price': np.random.uniform(10, 500, 200).round(2)\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\n# 创建透视表\nif all(col in orders_df.columns for col in ['product_category', 'region', 'amount']):\n    pivot_table = pd.pivot_table(\n        orders_df,\n        values='amount',\n        index='product_category',\n        columns='region',\n        aggfunc='mean',\n        fill_value=0\n    ).round(2)\n    \n    print('透视表结果:')\n    print(pivot_table)"
       },
       {
-        title: "步骤5：饼图的绘制和应用",
-        content: "饼图适合展示各部分占总体的比例：",
-        code: "# 绘制饼图\nplt.figure(figsize=(8, 8))\nplt.pie(population_data['人口'], labels=population_data['国家'], autopct='%1.1f%%', startangle=90)\nplt.title('各国人口占比')\nplt.axis('equal')  # 保证饼图是圆形\nplt.tight_layout()\nplt.show()"
-      },
-      {
-        title: "步骤6：散点图的绘制和应用",
-        content: "散点图适合展示两个变量之间的关系：",
-        code: "# 绘制散点图\nplt.figure(figsize=(10, 6))\nsns.scatterplot(x='x', y='y', data=scatter_data)\nplt.title('X和Y的关系')\nplt.xlabel('X')\nplt.ylabel('Y')\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()"
-      },
-      {
-        title: "步骤7：图表美化和定制",
-        content: "学习如何美化和定制图表，使其更专业、更美观：",
-        code: "# 美化折线图\nplt.figure(figsize=(12, 6))\nplt.plot(sales_data['日期'], sales_data['销售额'], \\\n         marker='o', linestyle='-', color='green', \\\n         linewidth=2, markersize=8, markeredgecolor='white', markeredgewidth=2)\nplt.title('月度销售额趋势', fontsize=16, fontweight='bold')\nplt.xlabel('日期', fontsize=12)\nplt.ylabel('销售额', fontsize=12)\nplt.grid(True, alpha=0.3, linestyle='--')\nplt.fill_between(sales_data['日期'], sales_data['销售额'], alpha=0.1, color='green')\nplt.tight_layout()\nplt.show()\n\n# 美化柱状图\nplt.figure(figsize=(12, 6))\nbars = sns.barplot(x='国家', y='人口', data=population_data, palette='viridis')\nplt.title('各国人口数量', fontsize=16, fontweight='bold')\nplt.xlabel('国家', fontsize=12)\nplt.ylabel('人口（百万）', fontsize=12)\nplt.xticks(rotation=45, fontsize=10)\n\n# 在柱子上添加数值标签\nfor bar in bars.patches:\n    height = bar.get_height()\n    plt.text(bar.get_x() + bar.get_width()/2., height + 5,\n             f'{height}', ha='center', va='bottom')\n\nplt.tight_layout()\nplt.show()"
+        title: "步骤5：窗口函数",
+        content: "学习滚动计算和排名：",
+        code: "import pandas as pd\nimport numpy as np\n\n# 创建模拟数据（独立运行）\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 201),\n    'quantity': np.random.randint(1, 10, 200),\n    'price': np.random.uniform(10, 500, 200).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=200, freq='D')\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\n# 滚动窗口计算\nif 'order_date' in orders_df.columns and 'amount' in orders_df.columns:\n    orders_df_sorted = orders_df.sort_values('order_date').copy()\n    \n    # 7天滚动平均\n    orders_df_sorted['rolling_7d'] = orders_df_sorted['amount'].rolling(window=7).mean()\n    \n    # 排名\n    orders_df_sorted['amount_rank'] = orders_df_sorted['amount'].rank(ascending=False)\n    \n    print('窗口函数计算完成！')\n    print('\\n前10行数据:')\n    print(orders_df_sorted[['order_date', 'amount', 'rolling_7d', 'amount_rank']].head(10))"
       }
     ],
     practiceTasks: [
-      "1. 使用Matplotlib绘制一个包含多条折线的图表，展示不同产品的销售趋势",
-      "2. 使用Seaborn绘制一个箱线图，展示不同类别的数据分布",
-      "3. 绘制一个热力图，展示不同变量之间的相关性"
+      "1. 按月份和产品类别分组，计算销售额",
+      "2. 创建一个地区×类别的销售透视表",
+      "3. 找出每个类别中销售额最高的产品"
     ],
     practiceTaskAnswers: [
-      "# 练习1答案：绘制多条折线图\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\n# 设置中文字体\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 创建示例数据\ndates = pd.date_range('2023-01-01', periods=12, freq='M')\nproducts = ['产品A', '产品B', '产品C']\n\ndata = {\n    '日期': dates\n}\n\nfor product in products:\n    data[product] = np.random.randint(1000, 5000, size=12)\n\ndf = pd.DataFrame(data)\n\n# 绘制多条折线图\nplt.figure(figsize=(12, 6))\nfor product in products:\n    plt.plot(df['日期'], df[product], marker='o', label=product)\n\nplt.title('不同产品销售趋势')\nplt.xlabel('日期')\nplt.ylabel('销售额')\nplt.legend()\nplt.grid(True, alpha=0.3)\nplt.xticks(rotation=45)\nplt.tight_layout()\nplt.show()\n",
-      "# 练习2答案：绘制箱线图\nimport pandas as pd\nimport numpy as np\nimport seaborn as sns\nimport matplotlib.pyplot as plt\n\n# 设置中文字体\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 创建示例数据\ncategories = ['类别A', '类别B', '类别C', '类别D']\ndata = []\n\nfor category in categories:\n    values = np.random.normal(loc=np.random.randint(50, 150), scale=np.random.randint(10, 30), size=100)\n    data.extend([(category, val) for val in values])\n\ndf = pd.DataFrame(data, columns=['类别', '值'])\n\n# 绘制箱线图\nplt.figure(figsize=(10, 6))\nsns.boxplot(x='类别', y='值', data=df, palette='viridis')\nplt.title('不同类别的数据分布')\nplt.xlabel('类别')\nplt.ylabel('值')\nplt.grid(True, alpha=0.3, axis='y')\nplt.tight_layout()\nplt.show()\n",
-      "# 练习3答案：绘制热力图\nimport pandas as pd\nimport numpy as np\nimport seaborn as sns\nimport matplotlib.pyplot as plt\n\n# 设置中文字体\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 创建示例数据\nvariables = ['变量1', '变量2', '变量3', '变量4', '变量5']\ncorr_matrix = np.random.rand(5, 5)\n# 确保对角线为1，矩阵对称\nfor i in range(5):\n    corr_matrix[i, i] = 1\n    for j in range(i+1, 5):\n        corr_matrix[i, j] = corr_matrix[j, i]\n\ndf_corr = pd.DataFrame(corr_matrix, index=variables, columns=variables)\n\n# 绘制热力图\nplt.figure(figsize=(10, 8))\nsns.heatmap(df_corr, annot=True, cmap='coolwarm', vmin=-1, vmax=1, center=0)\nplt.title('变量之间的相关性热力图')\nplt.tight_layout()\nplt.show()\n"
+      "# 练习1答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 201),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 200),\n    'quantity': np.random.randint(1, 10, 200),\n    'price': np.random.uniform(10, 500, 200).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=200, freq='D')\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\nif 'order_date' in orders_df.columns and 'product_category' in orders_df.columns and 'amount' in orders_df.columns:\n    orders_df['order_date'] = pd.to_datetime(orders_df['order_date'])\n    orders_df['month'] = orders_df['order_date'].dt.to_period('M')\n    \n    monthly_category_sales = orders_df.groupby(['month', 'product_category'])['amount'].sum().unstack()\n    print('月度类别销售额:')\n    print(monthly_category_sales)\n",
+      "# 练习2答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 201),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 200),\n    'region': np.random.choice(['华北', '华东', '华南', '西南'], 200),\n    'quantity': np.random.randint(1, 10, 200),\n    'price': np.random.uniform(10, 500, 200).round(2)\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\nif all(col in orders_df.columns for col in ['region', 'product_category', 'amount']):\n    pivot = pd.pivot_table(\n        orders_df,\n        values='amount',\n        index='region',\n        columns='product_category',\n        aggfunc='sum',\n        fill_value=0\n    )\n    print('地区×类别销售透视表:')\n    print(pivot)\n",
+      "# 练习3答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndata = {\n    'order_id': np.arange(1, 201),\n    'product_category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 200),\n    'product_name': np.random.choice(['商品A', '商品B', '商品C', '商品D', '商品E'], 200),\n    'quantity': np.random.randint(1, 10, 200),\n    'price': np.random.uniform(10, 500, 200).round(2)\n}\norders_df = pd.DataFrame(data)\norders_df['amount'] = orders_df['quantity'] * orders_df['price']\n\nif all(col in orders_df.columns for col in ['product_category', 'product_name', 'amount']):\n    top_products = orders_df.groupby(['product_category', 'product_name'])['amount'].sum()\\\n        .groupby(level=0, group_keys=False).nlargest(1)\n    print('每个类别销售额最高的产品:')\n    print(top_products)\n"
     ],
     assessment: [
-      "1. 折线图、柱状图、饼图和散点图分别适用于什么场景？",
-      "2. 如何在Matplotlib中设置中文字体，避免中文显示乱码？"
+      "1. groupby和pivot_table的区别是什么？",
+      "2. 如何在Pandas中实现SQL的GROUP BY功能？"
     ],
     assessmentAnswers: [
-      "- 折线图：适用于展示时间序列数据的变化趋势，例如销售额、股票价格等随时间的变化。\n- 柱状图：适用于比较不同类别的数据，例如不同产品的销售数量、不同地区的人口数量等。\n- 饼图：适用于展示各部分占总体的比例，例如不同产品类别的销售占比、不同年龄段的人口占比等。\n- 散点图：适用于展示两个变量之间的关系，例如身高与体重的关系、学习时间与成绩的关系等。",
-      "在Matplotlib中设置中文字体的方法：\n\n```python\nimport matplotlib.pyplot as plt\n\n# 设置中文字体\nplt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签\nplt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号\n```\n\n这样设置后，Matplotlib就可以正确显示中文了，不会出现乱码问题。"
-    ]
+      "groupby和pivot_table的区别：\\n- groupby：按行分组，适合简单的分组聚合\\n- pivot_table：可以同时按行和列分组，更适合创建交叉表\\n- pivot_table功能更强大，可以指定多个聚合函数",
+      "在Pandas中实现SQL的GROUP BY功能：\\n```python\\n# SQL: SELECT category, COUNT(*), AVG(amount) FROM orders GROUP BY category\\nresult = df.groupby('category').agg({\\n    'order_id': 'count',\\n    'amount': 'mean'\\n})\\n```"
+    ],
+    dataset: {
+      filename: "project2_sales.csv",
+      name: "项目2 - 销售数据",
+      size: "1.3KB",
+      desc: "销售数据，包含产品类别、地区、数量、价格、订单日期、产品名称等"
+    }
   },
   {
     id: 3,
-    title: "探索性数据分析(EDA)",
-    description: "深入分析电商用户数据，发现有价值的洞察",
-    goal: "通过电商用户数据的全面分析，学习探索性数据分析的完整流程，包括数据清洗、特征工程、深入分析和可视化",
-    dataSource: "电商用户行为数据",
-    tools: ["Python", "Pandas", "Plotly", "Matplotlib", "Seaborn"],
+    title: "超市购物篮分析",
+    description: "探索产品关联规则",
+    goal: "通过购物篮数据分析，学习关联规则挖掘、Apriori算法和产品推荐系统基础",
+    dataSource: "超市购物篮数据集",
+    tools: ["Python", "Pandas"],
     learningPoints: [
-      "数据清洗和预处理",
-      "特征工程基础",
-      "单变量分析",
-      "双变量和多变量分析",
-      "交互式可视化"
+      "购物篮数据转换",
+      "关联规则挖掘",
+      "支持度和置信度",
+      "产品推荐基础"
     ],
-    overview: "本项目将带你进行一次完整的探索性数据分析(EDA)。通过分析电商用户数据，你将学习如何系统地探索数据、发现模式、识别异常、提出假设并生成有价值的业务洞察。使用Plotly创建交互式图表，让你的分析结果更具吸引力。",
+    overview: "本项目将带你进行购物篮分析。通过分析超市购物数据，你将学习关联规则挖掘，理解支持度、置信度、提升度等指标，能够发现产品之间的有趣关联。",
+    duration: "45分钟",
     prerequisites: {
-      tools: ["Python 3.7+", "Jupyter Notebook", "Pandas", "NumPy", "Matplotlib", "Seaborn", "Plotly"],
-      datasets: ["电商用户行为数据集: https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store"]
+      tools: ["无前置要求，本项目会从零开始讲解"],
+      datasets: ["项目已内置模拟数据，无需额外下载"]
     },
     stepByStep: [
       {
-        title: "步骤1：环境搭建",
-        content: "安装所有必要的Python库：",
-        code: "pip install pandas numpy matplotlib seaborn plotly jupyter"
+        title: "步骤1：创建模拟数据",
+        content: "创建一个模拟的购物篮数据集：",
+        code: "import pandas as pd\nimport numpy as np\n\n# 创建模拟购物篮数据\nnp.random.seed(42)\nproducts = ['牛奶', '面包', '鸡蛋', '苹果', '香蕉', '橙汁', '饼干', '巧克力', '酸奶', '咖啡']\n\ntransactions = []\nfor _ in range(100):\n    # 每个订单随机购买2-5个商品\n    num_items = np.random.randint(2, 6)\n    items = np.random.choice(products, size=num_items, replace=False)\n    transactions.append(items)\n\nprint('购物篮数据创建完成！')\nprint(f'订单数量: {len(transactions)}')\nprint('\\n前5个订单:')\nfor i, items in enumerate(transactions[:5]):\n    print(f'订单{i+1}: {items}')"
       },
       {
-        title: "步骤2：数据加载与初步探索",
-        content: "加载电商用户行为数据并进行初步探索：",
-        code: "import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nimport plotly.express as px\nimport plotly.graph_objects as go\n\n# 设置中文字体\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 创建示例电商数据\nnp.random.seed(42)\ndata_size = 10000\n\ndata = {\n    'user_id': np.random.randint(1000, 9999, data_size),\n    'product_id': np.random.randint(10000, 99999, data_size),\n    'category': np.random.choice(['电子产品', '服装', '家居', '食品', '运动'], data_size),\n    'behavior': np.random.choice(['浏览', '点击', '加购', '购买'], data_size, p=[0.6, 0.25, 0.1, 0.05]),\n    'price': np.random.uniform(10, 1000, data_size).round(2),\n    'timestamp': pd.date_range('2023-01-01', periods=data_size, freq='min'),\n    'user_age': np.random.randint(18, 65, data_size),\n    'user_gender': np.random.choice(['男', '女'], data_size)\n}\n\ndf = pd.DataFrame(data)\n\nprint('数据形状:', df.shape)\nprint('\\n数据前5行:')\nprint(df.head())\nprint('\\n数据基本信息:')\nprint(df.info())\nprint('\\n缺失值统计:')\nprint(df.isnull().sum())"
+        title: "步骤2：数据转换",
+        content: "将购物篮数据转换为one-hot编码格式：",
+        code: "import pandas as pd\nimport numpy as np\nfrom collections import defaultdict\n\n# 创建模拟购物篮数据（独立运行）\nnp.random.seed(42)\nproducts = ['牛奶', '面包', '鸡蛋', '苹果', '香蕉', '橙汁', '饼干', '巧克力', '酸奶', '咖啡']\ntransactions = []\nfor _ in range(100):\n    num_items = np.random.randint(2, 6)\n    items = np.random.choice(products, size=num_items, replace=False)\n    transactions.append(items)\n\n# 转换为one-hot编码格式\nall_products = sorted(list(set([item for sublist in transactions for item in sublist])))\nproduct_to_idx = {prod: i for i, prod in enumerate(all_products)}\n\none_hot_data = []\nfor trans in transactions:\n    row = [0] * len(all_products)\n    for item in trans:\n        row[product_to_idx[item]] = 1\n    one_hot_data.append(row)\n\n# 转换为DataFrame\ndf_onehot = pd.DataFrame(one_hot_data, columns=all_products)\n\nprint('数据转换完成！')\nprint(f'数据形状: {df_onehot.shape}')\nprint('\\n前5行数据:')\nprint(df_onehot.head())"
       },
       {
-        title: "步骤3：数据清洗",
-        content: "处理数据中的异常值和重复值：",
-        code: "# 检查重复值\nprint('重复值数量:', df.duplicated().sum())\n\n# 删除重复值\ndf = df.drop_duplicates()\n\n# 检查价格异常值\nprint('\\n价格统计:')\nprint(df['price'].describe())\n\n# 处理异常价格（例如删除价格为0或负数的记录）\ndf = df[df['price'] > 0]\n\nprint('\\n清洗后数据形状:', df.shape)"
+        title: "步骤3：计算支持度",
+        content: "计算每个商品和商品组合的支持度：",
+        code: "import pandas as pd\nimport numpy as np\nfrom collections import defaultdict\n\n# 创建模拟购物篮数据（独立运行）\nnp.random.seed(42)\nproducts = ['牛奶', '面包', '鸡蛋', '苹果', '香蕉', '橙汁', '饼干', '巧克力', '酸奶', '咖啡']\ntransactions = []\nfor _ in range(100):\n    num_items = np.random.randint(2, 6)\n    items = np.random.choice(products, size=num_items, replace=False)\n    transactions.append(items)\n\n# 转换为one-hot编码\nall_products = sorted(list(set([item for sublist in transactions for item in sublist])))\nproduct_to_idx = {prod: i for i, prod in enumerate(all_products)}\none_hot_data = []\nfor trans in transactions:\n    row = [0] * len(all_products)\n    for item in trans:\n        row[product_to_idx[item]] = 1\n    one_hot_data.append(row)\ndf_onehot = pd.DataFrame(one_hot_data, columns=all_products)\n\n# 计算单个商品的支持度\nsupport = df_onehot.mean().sort_values(ascending=False)\nprint('商品支持度（Top 10）:')\nprint(support.head(10))\n\n# 计算商品组合的支持度\nprint('\\n常见商品组合:')\nfor i, prod1 in enumerate(all_products[:3]):\n    for prod2 in all_products[i+1:4]:\n        combo_support = ((df_onehot[prod1] == 1) & (df_onehot[prod2] == 1)).mean()\n        if combo_support > 0.05:\n            print(f'{prod1} + {prod2}: {combo_support:.3f}')"
       },
       {
-        title: "步骤4：单变量分析",
-        content: "对各个变量进行单独分析：",
-        code: "# 用户行为分布\nbehavior_counts = df['behavior'].value_counts()\nprint('用户行为分布:')\nprint(behavior_counts)\n\nplt.figure(figsize=(10, 6))\nsns.countplot(x='behavior', data=df, palette='viridis')\nplt.title('用户行为分布')\nplt.xlabel('行为类型')\nplt.ylabel('数量')\nplt.show()\n\n# 价格分布\nplt.figure(figsize=(12, 5))\nplt.subplot(1, 2, 1)\nsns.histplot(df['price'], bins=30, kde=True)\nplt.title('价格分布')\n\nplt.subplot(1, 2, 2)\nsns.boxplot(y='price', data=df)\nplt.title('价格箱线图')\nplt.tight_layout()\nplt.show()\n\n# 年龄分布\nplt.figure(figsize=(10, 6))\nsns.histplot(df['user_age'], bins=20, kde=True)\nplt.title('用户年龄分布')\nplt.xlabel('年龄')\nplt.show()"
+        title: "步骤4：计算置信度",
+        content: "计算关联规则的置信度：",
+        code: "import pandas as pd\nimport numpy as np\nfrom collections import defaultdict\n\n# 创建模拟购物篮数据（独立运行）\nnp.random.seed(42)\nproducts = ['牛奶', '面包', '鸡蛋', '苹果', '香蕉', '橙汁', '饼干', '巧克力', '酸奶', '咖啡']\ntransactions = []\nfor _ in range(100):\n    num_items = np.random.randint(2, 6)\n    items = np.random.choice(products, size=num_items, replace=False)\n    transactions.append(items)\n\n# 转换为one-hot编码\nall_products = sorted(list(set([item for sublist in transactions for item in sublist])))\nproduct_to_idx = {prod: i for i, prod in enumerate(all_products)}\none_hot_data = []\nfor trans in transactions:\n    row = [0] * len(all_products)\n    for item in trans:\n        row[product_to_idx[item]] = 1\n    one_hot_data.append(row)\ndf_onehot = pd.DataFrame(one_hot_data, columns=all_products)\n\n# 计算置信度: 如果购买了A，也购买了B的概率\nprint('关联规则置信度:')\nfor prod1 in all_products[:3]:\n    for prod2 in all_products:\n        if prod1 != prod2:\n            support_a = df_onehot[prod1].mean()\n            support_ab = ((df_onehot[prod1] == 1) & (df_onehot[prod2] == 1)).mean()\n            if support_a > 0:\n                confidence = support_ab / support_a\n                if confidence > 0.3:\n                    print(f'{prod1} → {prod2}: 置信度={confidence:.3f}')"
       },
       {
-        title: "步骤5：双变量和多变量分析",
-        content: "分析变量之间的关系：",
-        code: "# 不同品类的价格分布\nplt.figure(figsize=(12, 6))\nsns.boxplot(x='category', y='price', data=df)\nplt.title('不同品类的价格分布')\nplt.xticks(rotation=45)\nplt.show()\n\n# 不同性别的行为偏好\nbehavior_gender = pd.crosstab(df['user_gender'], df['behavior'], normalize='index')\nprint('不同性别的行为偏好:')\nprint(behavior_gender)\n\nbehavior_gender.plot(kind='bar', stacked=True, figsize=(12, 6))\nplt.title('不同性别的行为偏好')\nplt.xlabel('性别')\nplt.ylabel('比例')\nplt.legend(title='行为类型')\nplt.show()\n\n# 年龄与购买力关系\ndf['age_group'] = pd.cut(df['user_age'], bins=[18, 25, 35, 45, 55, 65], \\n                         labels=['18-25', '26-35', '36-45', '46-55', '56-65'])\n\nage_group_price = df.groupby('age_group')['price'].mean()\nprint('\\n不同年龄段的平均消费:')\nprint(age_group_price)\n\nplt.figure(figsize=(10, 6))\nage_group_price.plot(kind='bar', color='green')\nplt.title('不同年龄段的平均消费')\nplt.xlabel('年龄段')\nplt.ylabel('平均价格')\nplt.show()"
-      },
-      {
-        title: "步骤6：交互式可视化",
-        content: "使用Plotly创建交互式图表：",
-        code: "# 交互式品类销售分析\ncategory_sales = df[df['behavior'] == '购买'].groupby('category').agg({\n    'price': 'sum',\n    'user_id': 'count'\n}).reset_index()\ncategory_sales.columns = ['品类', '总销售额', '购买次数']\n\nfig = px.bar(category_sales, x='品类', y='总销售额', \\n             title='不同品类的销售情况',\n             hover_data=['购买次数'],\n             color='品类',\n             color_discrete_sequence=px.colors.qualitative.Set3)\nfig.update_layout(xaxis_tickangle=-45)\nfig.show()\n\n# 交互式时间趋势分析\ndf['date'] = df['timestamp'].dt.date\ndaily_purchases = df[df['behavior'] == '购买'].groupby('date').size().reset_index()\ndaily_purchases.columns = ['日期', '购买次数']\n\nfig = px.line(daily_purchases, x='日期', y='购买次数', \\n              title='每日购买次数趋势',\n              markers=True)\nfig.update_layout(yaxis_title='购买次数')\nfig.show()"
+        title: "步骤5：简单推荐系统",
+        content: "基于关联规则创建简单的推荐系统：",
+        code: "import pandas as pd\nimport numpy as np\nfrom collections import defaultdict\n\n# 创建模拟购物篮数据（独立运行）\nnp.random.seed(42)\nproducts = ['牛奶', '面包', '鸡蛋', '苹果', '香蕉', '橙汁', '饼干', '巧克力', '酸奶', '咖啡']\ntransactions = []\nfor _ in range(100):\n    num_items = np.random.randint(2, 6)\n    items = np.random.choice(products, size=num_items, replace=False)\n    transactions.append(items)\n\n# 转换为one-hot编码\nall_products = sorted(list(set([item for sublist in transactions for item in sublist])))\nproduct_to_idx = {prod: i for i, prod in enumerate(all_products)}\none_hot_data = []\nfor trans in transactions:\n    row = [0] * len(all_products)\n    for item in trans:\n        row[product_to_idx[item]] = 1\n    one_hot_data.append(row)\ndf_onehot = pd.DataFrame(one_hot_data, columns=all_products)\n\n# 简单的商品推荐函数\ndef recommend_products(purchased_items, top_n=3):\n    recommendations = defaultdict(float)\n    \n    for item in purchased_items:\n        if item in all_products:\n            for other_item in all_products:\n                if other_item not in purchased_items:\n                    support_item = df_onehot[item].mean()\n                    support_both = ((df_onehot[item] == 1) & (df_onehot[other_item] == 1)).mean()\n                    if support_item > 0:\n                        confidence = support_both / support_item\n                        recommendations[other_item] = max(recommendations[other_item], confidence)\n    \n    sorted_recs = sorted(recommendations.items(), key=lambda x: x[1], reverse=True)\n    return sorted_recs[:top_n]\n\n# 测试推荐\nprint('推荐系统测试:')\ntest_purchase = ['牛奶', '面包']\nprint(f'已购买: {test_purchase}')\nrecs = recommend_products(test_purchase)\nprint('推荐商品:')\nfor prod, score in recs:\n    print(f'  {prod}: 置信度={score:.3f}')"
       }
     ],
     practiceTasks: [
-      "1. 分析不同时间段（小时、星期）的用户行为模式",
-      "2. 找出转化率最高的产品品类，并分析其原因",
-      "3. 创建一个用户画像，根据消费行为将用户分为不同的群体"
+      "1. 找出最常被一起购买的5组产品",
+      "2. 分析哪些产品最常被单独购买",
+      "3. 设计一个简单的产品推荐逻辑"
     ],
     practiceTaskAnswers: [
-      "# 练习1答案：分析不同时间段的用户行为模式\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 假设df是电商用户行为数据\n# 添加时间维度\ndf['小时'] = df['timestamp'].dt.hour\ndf['星期'] = df['timestamp'].dt.dayofweek\n\n# 分析小时维度的行为模式\nhourly_behavior = pd.crosstab(df['小时'], df['behavior'], normalize='index') * 100\n\nplt.figure(figsize=(14, 6))\nhourly_behavior.plot(kind='line', figsize=(14, 6))\nplt.title('不同小时的用户行为模式')\nplt.xlabel('小时')\nplt.ylabel('百分比 (%)')\nplt.xticks(range(24))\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n# 分析星期维度的行为模式\nweekly_behavior = pd.crosstab(df['星期'], df['behavior'], normalize='index') * 100\n\nplt.figure(figsize=(14, 6))\nweekly_behavior.plot(kind='bar', figsize=(14, 6))\nplt.title('不同星期的用户行为模式')\nplt.xlabel('星期')\nplt.ylabel('百分比 (%)')\nplt.xticks(range(7), ['周一', '周二', '周三', '周四', '周五', '周六', '周日'])\nplt.grid(True, alpha=0.3, axis='y')\nplt.tight_layout()\nplt.show()\n",
-      "# 练习2答案：找出转化率最高的产品品类\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 计算各品类的转化率\ncategory_stats = df.groupby('category').agg({\n    'behavior': lambda x: (x == '购买').sum() / len(x) * 100\n}).sort_values('behavior', ascending=False)\n\ncategory_stats.columns = ['转化率 (%)']\n\nprint('各品类转化率:')\nprint(category_stats)\n\n# 可视化\nplt.figure(figsize=(12, 6))\ncategory_stats.plot(kind='bar', color='green', alpha=0.7)\nplt.title('各品类转化率对比')\nplt.xlabel('产品品类')\nplt.ylabel('转化率 (%)')\nplt.xticks(rotation=45)\nplt.grid(True, alpha=0.3, axis='y')\nplt.tight_layout()\nplt.show()\n\n# 分析原因 - 查看各品类的平均价格\ncategory_price = df.groupby('category')['price'].mean()\nprint('\n各品类平均价格:')\nprint(category_price)\n",
-      "# 练习3答案：创建用户画像\nimport pandas as pd\nimport numpy as np\nfrom sklearn.cluster import KMeans\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 计算用户特征\nuser_features = df.groupby('user_id').agg({\n    'behavior': lambda x: (x == '购买').sum(),  # 购买次数\n    'price': 'mean',  # 平均消费\n    'timestamp': 'count'  # 总行为次数\n}).reset_index()\n\nuser_features.columns = ['user_id', '购买次数', '平均消费', '总行为次数']\n\n# 使用K-Means进行聚类\nfeatures = user_features[['购买次数', '平均消费', '总行为次数']]\n\n# 标准化\nfrom sklearn.preprocessing import StandardScaler\nscaler = StandardScaler()\nscaled_features = scaler.fit_transform(features)\n\n# 确定最佳聚类数\ninertia = []\nfor k in range(1, 11):\n    kmeans = KMeans(n_clusters=k, random_state=42)\n    kmeans.fit(scaled_features)\n    inertia.append(kmeans.inertia_)\n\nplt.figure(figsize=(10, 6))\nplt.plot(range(1, 11), inertia, marker='o')\nplt.title('K-Means聚类 - 肘部法则')\nplt.xlabel('聚类数')\nplt.ylabel('惯性')\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n# 选择3个聚类\nkmeans = KMeans(n_clusters=3, random_state=42)\nuser_features['用户群体'] = kmeans.fit_predict(scaled_features)\n\n# 分析各群体特征\ngroup_stats = user_features.groupby('用户群体').mean()\nprint('各用户群体特征:')\nprint(group_stats)\n\n# 可视化\nplt.figure(figsize=(12, 8))\nsns.scatterplot(x='总行为次数', y='平均消费', hue='用户群体', data=user_features, palette='viridis')\nplt.title('用户群体分布')\nplt.xlabel('总行为次数')\nplt.ylabel('平均消费')\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n"
+      "# 练习1答案\nimport pandas as pd\nimport numpy as np\nfrom collections import defaultdict\n\n# 创建模拟数据\nnp.random.seed(42)\nproducts = ['牛奶', '面包', '鸡蛋', '苹果', '香蕉', '橙汁', '饼干', '巧克力', '酸奶', '咖啡']\ntransactions = []\nfor _ in range(100):\n    num_items = np.random.randint(2, 6)\n    items = np.random.choice(products, size=num_items, replace=False)\n    transactions.append(items)\n\n# 找出常被一起购买的商品\nall_products = sorted(list(set([item for sublist in transactions for item in sublist])))\nproduct_to_idx = {prod: i for i, prod in enumerate(all_products)}\n\none_hot_data = []\nfor trans in transactions:\n    row = [0] * len(all_products)\n    for item in trans:\n        row[product_to_idx[item]] = 1\n    one_hot_data.append(row)\n\ndf_onehot = pd.DataFrame(one_hot_data, columns=all_products)\n\n# 计算商品组合的支持度\ncombo_supports = []\nfor i, prod1 in enumerate(all_products):\n    for prod2 in all_products[i+1:]:\n        support = ((df_onehot[prod1] == 1) & (df_onehot[prod2] == 1)).mean()\n        if support > 0:\n            combo_supports.append(((prod1, prod2), support))\n\ncombo_supports.sort(key=lambda x: x[1], reverse=True)\nprint('最常被一起购买的商品组合:')\nfor combo, support in combo_supports[:5]:\n    print(f'{combo[0]} + {combo[1]}: {support:.3f}')\n",
+      "# 练习2答案\nimport pandas as pd\nimport numpy as np\nfrom collections import Counter\n\n# 创建模拟数据\nnp.random.seed(42)\nproducts = ['牛奶', '面包', '鸡蛋', '苹果', '香蕉', '橙汁', '饼干', '巧克力', '酸奶', '咖啡']\ntransactions = []\nfor _ in range(100):\n    num_items = np.random.randint(2, 6)\n    items = np.random.choice(products, size=num_items, replace=False)\n    transactions.append(items)\n\n# 统计商品出现频率\nproduct_counts = Counter()\nfor trans in transactions:\n    for item in trans:\n        product_counts[item] += 1\n\nprint('最常被购买的商品:')\nfor product, count in product_counts.most_common(10):\n    print(f'{product}: {count}次')\n",
+      "# 练习3答案\nprint('产品推荐逻辑: 基于关联规则，当用户购买某些产品时，推荐高置信度的关联产品')\nprint('步骤:')\nprint('1. 计算商品之间的关联规则置信度')\nprint('2. 当用户购买某些商品时，查找相关的关联规则')\nprint('3. 按置信度排序并推荐Top N商品')\n"
     ],
     assessment: [
-      "1. 什么是探索性数据分析(EDA)？它的主要目的是什么？",
-      "2. 在EDA中，单变量分析和多变量分析有什么区别？"
+      "1. 解释支持度、置信度和提升度的含义",
+      "2. 购物篮分析在实际业务中有什么应用？"
     ],
     assessmentAnswers: [
-      "探索性数据分析(Exploratory Data Analysis, EDA)是一种数据分析方法，通过可视化、统计分析等手段对数据进行初步探索，以发现数据中的模式、异常、关系等信息。\n\n主要目的：\n1. 了解数据的基本结构和特征\n2. 发现数据中的模式和趋势\n3. 识别数据中的异常值和缺失值\n4. 探索变量之间的关系\n5. 为后续的建模和分析提供方向\n6. 生成假设和洞察",
-      "- 单变量分析：只分析一个变量的特征和分布。例如：\n  1. 分析年龄的分布情况\n  2. 统计不同性别的人数\n  3. 查看销售额的统计描述\n\n- 多变量分析：分析两个或多个变量之间的关系。例如：\n  1. 分析年龄与购买金额的关系\n  2. 查看不同性别在不同地区的分布\n  3. 分析多个变量之间的相关性\n\n单变量分析帮助我们了解每个变量的基本情况，多变量分析则帮助我们发现变量之间的关联和交互作用。"
-    ]
+      "支持度、置信度和提升度的含义：\\n- 支持度(Support)：项集出现的频率\\n- 置信度(Confidence)：A→B的条件概率\\n- 提升度(Lift)：A和B一起出现的可能性除以单独出现的可能性",
+      "购物篮分析的应用：\\n1. 产品摆放优化：将关联产品放在一起\\n2. 交叉销售推荐：买了A推荐B\\n3. 促销活动设计：关联产品一起打折\\n4. 库存管理：关联产品库存联动"
+    ],
+    dataset: {
+      filename: "project3_basket.csv",
+      name: "项目3 - 购物篮数据",
+      size: "0.5KB",
+      desc: "超市购物篮数据，包含交易ID和购买商品列表"
+    }
   },
   {
     id: 4,
-    title: "业务指标构建与分析",
-    description: "学习构建和分析关键业务指标",
-    goal: "通过企业销售数据，学习如何设计、计算和分析关键业务指标，为业务决策提供数据支持",
-    dataSource: "企业销售数据",
-    tools: ["Python", "Pandas", "Excel"],
+    title: "客户分群画像",
+    description: "学习客户细分方法",
+    goal: "通过客户数据，学习RFM分析、K-Means聚类和客户画像构建",
+    dataSource: "客户特征数据集",
+    tools: ["Python", "Pandas", "Scikit-learn"],
     learningPoints: [
-      "业务指标设计",
-      "核心指标计算",
-      "趋势分析",
-      "同比环比分析",
-      "业绩评估"
+      "RFM分析",
+      "特征工程",
+      "K-Means聚类",
+      "聚类结果可视化",
+      "客户画像构建"
     ],
-    overview: "本项目将带你学习如何从业务角度构建和分析关键指标。通过处理企业销售数据，你将掌握如何设计有意义的业务指标、计算核心KPI、进行趋势分析以及同比环比分析，最终能够用数据支撑业务决策。",
+    overview: "本项目将带你学习客户分群技术。通过RFM分析和K-Means聚类，你将能够对客户进行细分，并为每个客户群构建详细画像，为精准营销提供数据支持。",
+    duration: "45分钟",
     prerequisites: {
-      tools: ["Python 3.7+", "Jupyter Notebook", "Pandas", "NumPy", "Microsoft Excel 或 Google Sheets"],
-      datasets: ["企业销售数据示例: https://www.kaggle.com/datasets/kyanyoga/sample-sales-data"]
+      tools: ["无前置要求，本项目会从零开始讲解"],
+      datasets: ["项目已内置模拟数据，无需额外下载"]
     },
     stepByStep: [
       {
-        title: "步骤1：环境搭建",
-        content: "安装必要的Python库：",
-        code: "pip install pandas numpy jupyter openpyxl"
+        title: "步骤1：创建模拟数据",
+        content: "创建一个模拟的客户特征数据集：",
+        code: "import pandas as pd\nimport numpy as np\nfrom datetime import datetime, timedelta\n\n# 创建模拟客户数据\nnp.random.seed(42)\n\nn_customers = 200\nend_date = datetime(2024, 6, 30)\n\ncustomer_data = {\n    'customer_id': np.arange(1001, 1001 + n_customers),\n    'last_purchase_date': [end_date - timedelta(days=np.random.randint(1, 180)) for _ in range(n_customers)],\n    'frequency': np.random.randint(1, 20, n_customers),\n    'monetary': np.random.uniform(100, 10000, n_customers).round(2),\n    'age': np.random.randint(18, 70, n_customers),\n    'region': np.random.choice(['华北', '华东', '华南', '西南', '西北'], n_customers)\n}\n\ncustomer_df = pd.DataFrame(customer_data)\n\n# 计算最近购买天数（距离结束日期）\ncustomer_df['recency_days'] = (end_date - customer_df['last_purchase_date']).dt.days\n\nprint('客户数据创建完成！')\nprint(f'数据形状: {customer_df.shape}')\nprint('\\n前5行数据:')\nprint(customer_df.head())"
       },
       {
-        title: "步骤2：数据加载与准备",
-        content: "加载企业销售数据并进行准备：",
-        code: "import pandas as pd\nimport numpy as np\nfrom datetime import datetime, timedelta\n\n# 设置随机种子保证可复现\nnp.random.seed(42)\n\n# 创建示例销售数据\ndates = pd.date_range('2022-01-01', '2023-12-31', freq='D')\ndata = []\n\nfor date in dates:\n    # 每天生成10-50条销售记录\n    daily_records = np.random.randint(10, 50)\n    for _ in range(daily_records):\n        data.append({\n            '日期': date,\n            '订单编号': f'ORD{np.random.randint(10000, 99999)}',\n            '产品名称': np.random.choice(['产品A', '产品B', '产品C', '产品D', '产品E']),\n            '产品类别': np.random.choice(['电子产品', '服装', '家居']),\n            '销售数量': np.random.randint(1, 10),\n            '单价': np.random.choice([99, 199, 299, 499, 799, 999]),\n            '销售员': np.random.choice(['张三', '李四', '王五', '赵六', '钱七']),\n            '地区': np.random.choice(['华北', '华东', '华南', '华西', '华中']),\n            '客户类型': np.random.choice(['新客户', '老客户', 'VIP客户'])\n        })\n\ndf = pd.DataFrame(data)\n\n# 计算销售额\ndf['销售额'] = df['销售数量'] * df['单价']\n\nprint('数据形状:', df.shape)\nprint('\\n数据前5行:')\nprint(df.head())\nprint('\\n数据基本信息:')\nprint(df.info())"
+        title: "步骤2：RFM分析",
+        content: "计算RFM指标并进行评分：",
+        code: "import pandas as pd\nimport numpy as np\nfrom datetime import datetime, timedelta\n\n# 创建模拟客户数据（独立运行）\nnp.random.seed(42)\nn_customers = 200\nend_date = datetime(2024, 6, 30)\ncustomer_data = {\n    'customer_id': np.arange(1001, 1001 + n_customers),\n    'last_purchase_date': [end_date - timedelta(days=np.random.randint(1, 180)) for _ in range(n_customers)],\n    'frequency': np.random.randint(1, 20, n_customers),\n    'monetary': np.random.uniform(100, 10000, n_customers).round(2),\n    'age': np.random.randint(18, 70, n_customers),\n    'region': np.random.choice(['华北', '华东', '华南', '西南', '西北'], n_customers)\n}\ncustomer_df = pd.DataFrame(customer_data)\ncustomer_df['recency_days'] = (end_date - customer_df['last_purchase_date']).dt.days\n\n# RFM评分\n# R（Recency）：最近购买，天数越少越好\ncustomer_df['R_score'] = pd.qcut(customer_df['recency_days'], 5, labels=[5, 4, 3, 2, 1])\n\n# F（Frequency）：购买频率，越大越好\ncustomer_df['F_score'] = pd.qcut(customer_df['frequency'], 5, labels=[1, 2, 3, 4, 5])\n\n# M（Monetary）：购买金额，越大越好\ncustomer_df['M_score'] = pd.qcut(customer_df['monetary'], 5, labels=[1, 2, 3, 4, 5])\n\n# 组合RFM分数\ncustomer_df['RFM_score'] = customer_df['R_score'].astype(str) + customer_df['F_score'].astype(str) + customer_df['M_score'].astype(str)\n\nprint('RFM分析完成！')\nprint('\\nRFM分数分布:')\nprint(customer_df[['R_score', 'F_score', 'M_score']].describe())\nprint('\\n前10个客户的RFM分数:')\nprint(customer_df[['customer_id', 'R_score', 'F_score', 'M_score', 'RFM_score']].head(10))"
       },
       {
-        title: "步骤3：核心业务指标计算",
-        content: "计算关键业务指标：",
-        code: "# 整体指标计算\ntotal_sales = df['销售额'].sum()\ntotal_orders = df['订单编号'].nunique()\ntotal_quantity = df['销售数量'].sum()\naverage_order_value = total_sales / total_orders\n\nprint('=== 整体业务指标 ===')\nprint(f'总销售额: {total_sales:,.2f} 元')\nprint(f'总订单数: {total_orders:,.0f}')\nprint(f'总销售数量: {total_quantity:,.0f}')\nprint(f'平均订单金额: {average_order_value:,.2f} 元')\n\n# 按维度分析指标\nprint('\\n=== 按产品类别分析 ===')\ncategory_analysis = df.groupby('产品类别').agg({\n    '销售额': 'sum',\n    '订单编号': 'nunique',\n    '销售数量': 'sum'\n}).round(2)\ncategory_analysis.columns = ['销售额', '订单数', '销售数量']\ncategory_analysis['销售额占比'] = category_analysis['销售额'] / total_sales * 100\nprint(category_analysis)\n\nprint('\\n=== 按地区分析 ===')\nregion_analysis = df.groupby('地区').agg({\n    '销售额': 'sum',\n    '订单编号': 'nunique'\n}).round(2)\nregion_analysis.columns = ['销售额', '订单数']\nregion_analysis['销售额占比'] = region_analysis['销售额'] / total_sales * 100\nprint(region_analysis.sort_values('销售额', ascending=False))\n\nprint('\\n=== 按销售员分析 ===')\nsalesperson_analysis = df.groupby('销售员').agg({\n    '销售额': 'sum',\n    '订单编号': 'nunique'\n}).round(2)\nsalesperson_analysis.columns = ['销售额', '订单数']\nprint(salesperson_analysis.sort_values('销售额', ascending=False))"
+        title: "步骤3：K-Means聚类",
+        content: "使用K-Means进行客户分群：",
+        code: "import pandas as pd\nimport numpy as np\nfrom datetime import datetime, timedelta\nfrom sklearn.cluster import KMeans\nfrom sklearn.preprocessing import StandardScaler\n\n# 创建模拟客户数据（独立运行）\nnp.random.seed(42)\nn_customers = 200\nend_date = datetime(2024, 6, 30)\ncustomer_data = {\n    'customer_id': np.arange(1001, 1001 + n_customers),\n    'frequency': np.random.randint(1, 20, n_customers),\n    'monetary': np.random.uniform(100, 10000, n_customers).round(2),\n    'recency_days': np.random.randint(1, 180, n_customers)\n}\ncustomer_df = pd.DataFrame(customer_data)\n\n# 选择特征进行聚类\nfeatures = customer_df[['recency_days', 'frequency', 'monetary']].copy()\n\n# 标准化特征\nscaler = StandardScaler()\nfeatures_scaled = scaler.fit_transform(features)\n\n# K-Means聚类\nkmeans = KMeans(n_clusters=4, random_state=42, n_init=10)\ncustomer_df['cluster'] = kmeans.fit_predict(features_scaled)\n\nprint('聚类完成！')\nprint('\\n客户群分布:')\nprint(customer_df['cluster'].value_counts().sort_index())"
       },
       {
-        title: "步骤4：时间趋势分析",
-        content: "分析业务指标随时间的变化趋势：",
-        code: "# 按月份汇总数据\ndf['月份'] = df['日期'].dt.to_period('M')\nmonthly_data = df.groupby('月份').agg({\n    '销售额': 'sum',\n    '订单编号': 'nunique',\n    '销售数量': 'sum'\n}).reset_index()\nmonthly_data.columns = ['月份', '销售额', '订单数', '销售数量']\n\nprint('=== 月度销售数据 ===')\nprint(monthly_data)\n\n# 绘制趋势图\nimport matplotlib.pyplot as plt\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\nfig, axes = plt.subplots(2, 1, figsize=(14, 10))\n\n# 销售额趋势\naxes[0].plot(monthly_data['月份'].astype(str), monthly_data['销售额'], \\\n             marker='o', color='green', linewidth=2)\naxes[0].set_title('月度销售额趋势', fontsize=14, fontweight='bold')\naxes[0].set_xlabel('月份')\naxes[0].set_ylabel('销售额')\naxes[0].tick_params(axis='x', rotation=45)\naxes[0].grid(True, alpha=0.3)\n\n# 订单数趋势\naxes[1].plot(monthly_data['月份'].astype(str), monthly_data['订单数'], \\\n             marker='s', color='blue', linewidth=2)\naxes[1].set_title('月度订单数趋势', fontsize=14, fontweight='bold')\naxes[1].set_xlabel('月份')\naxes[1].set_ylabel('订单数')\naxes[1].tick_params(axis='x', rotation=45)\naxes[1].grid(True, alpha=0.3)\n\nplt.tight_layout()\nplt.show()"
+        title: "步骤4：客户画像分析",
+        content: "分析每个客户群的特征：",
+        code: "import pandas as pd\nimport numpy as np\nfrom datetime import datetime, timedelta\nfrom sklearn.cluster import KMeans\nfrom sklearn.preprocessing import StandardScaler\n\n# 创建模拟客户数据（独立运行）\nnp.random.seed(42)\nn_customers = 200\nend_date = datetime(2024, 6, 30)\ncustomer_data = {\n    'customer_id': np.arange(1001, 1001 + n_customers),\n    'frequency': np.random.randint(1, 20, n_customers),\n    'monetary': np.random.uniform(100, 10000, n_customers).round(2),\n    'age': np.random.randint(18, 70, n_customers),\n    'recency_days': np.random.randint(1, 180, n_customers)\n}\ncustomer_df = pd.DataFrame(customer_data)\n\n# 聚类\nfeatures = customer_df[['recency_days', 'frequency', 'monetary']].copy()\nscaler = StandardScaler()\nfeatures_scaled = scaler.fit_transform(features)\nkmeans = KMeans(n_clusters=4, random_state=42, n_init=10)\ncustomer_df['cluster'] = kmeans.fit_predict(features_scaled)\n\n# 分析每个聚类的特征\ncluster_profile = customer_df.groupby('cluster').agg({\n    'recency_days': 'mean',\n    'frequency': 'mean',\n    'monetary': 'mean',\n    'age': 'mean',\n    'customer_id': 'count'\n}).round(2)\n\ncluster_profile.columns = ['平均最近购买天数', '平均购买频率', '平均消费金额', '平均年龄', '客户数量']\n\nprint('客户群画像:')\nprint(cluster_profile)\n\n# 简单的客户群命名\nprint('\\n客户群描述:')\ncluster_names = {\n    0: '高价值客户',\n    1: '新客户',\n    2: '流失风险客户',\n    3: '普通客户'\n}\nfor cluster_id in sorted(customer_df['cluster'].unique()):\n    print(f'群{cluster_id} ({cluster_names.get(cluster_id, \"未知\")}): {cluster_profile.loc[cluster_id, \"客户数量\"]}人')"
       },
       {
-        title: "步骤5：同比环比分析",
-        content: "计算同比和环比增长率：",
-        code: "# 计算环比增长率\nmonthly_data['销售额_环比'] = monthly_data['销售额'].pct_change() * 100\nmonthly_data['订单数_环比'] = monthly_data['订单数'].pct_change() * 100\n\n# 计算同比增长率（与去年同期相比）\nmonthly_data['销售额_同比'] = monthly_data['销售额'].pct_change(12) * 100\nmonthly_data['订单数_同比'] = monthly_data['订单数'].pct_change(12) * 100\n\nprint('=== 同比环比分析 ===')\nprint(monthly_data[['月份', '销售额', '销售额_环比', '销售额_同比', \\\n                    '订单数', '订单数_环比', '订单数_同比']].round(2))\n\n# 可视化同比环比\nfig, axes = plt.subplots(2, 1, figsize=(14, 10))\n\nx = monthly_data['月份'].astype(str)\n\naxes[0].bar(x, monthly_data['销售额_环比'], color='orange', alpha=0.7, label='环比')\naxes[0].bar(x, monthly_data['销售额_同比'], color='green', alpha=0.5, label='同比')\naxes[0].axhline(y=0, color='red', linestyle='--', linewidth=0.8)\naxes[0].set_title('销售额同比环比增长率', fontsize=14, fontweight='bold')\naxes[0].set_xlabel('月份')\naxes[0].set_ylabel('增长率 (%)')\naxes[0].legend()\naxes[0].tick_params(axis='x', rotation=45)\naxes[0].grid(True, alpha=0.3, axis='y')\n\naxes[1].bar(x, monthly_data['订单数_环比'], color='orange', alpha=0.7, label='环比')\naxes[1].bar(x, monthly_data['订单数_同比'], color='green', alpha=0.5, label='同比')\naxes[1].axhline(y=0, color='red', linestyle='--', linewidth=0.8)\naxes[1].set_title('订单数同比环比增长率', fontsize=14, fontweight='bold')\naxes[1].set_xlabel('月份')\naxes[1].set_ylabel('增长率 (%)')\naxes[1].legend()\naxes[1].tick_params(axis='x', rotation=45)\naxes[1].grid(True, alpha=0.3, axis='y')\n\nplt.tight_layout()\nplt.show()"
-      },
-      {
-        title: "步骤6：数据导出到Excel",
-        content: "将分析结果导出到Excel，方便业务团队查看：",
-        code: "# 创建Excel写入器\nwith pd.ExcelWriter('业务分析报告.xlsx', engine='openpyxl') as writer:\n    # 整体指标表\n    overall_metrics = pd.DataFrame({\n        '指标': ['总销售额', '总订单数', '总销售数量', '平均订单金额'],\n        '数值': [total_sales, total_orders, total_quantity, average_order_value]\n    })\n    overall_metrics.to_excel(writer, sheet_name='整体指标', index=False)\n    \\n    # 按类别分析\n    category_analysis.to_excel(writer, sheet_name='品类分析')\n    \\n    # 按地区分析\n    region_analysis.to_excel(writer, sheet_name='地区分析')\n    \\n    # 按销售员分析\n    salesperson_analysis.to_excel(writer, sheet_name='销售员分析')\n    \\n    # 月度趋势\n    monthly_data.to_excel(writer, sheet_name='月度趋势', index=False)\n\nprint('Excel报告已生成：业务分析报告.xlsx')"
+        title: "步骤5：营销建议",
+        content: "根据客户群特征给出营销建议：",
+        code: "# 基于聚类结果的营销建议\nprint('营销策略建议:')\nprint('\\n高价值客户:')\nprint('- 提供VIP专属优惠和服务')\nprint('- 邀请参与新品测试')\nprint('- 个性化推荐高端产品')\n\nprint('\\n新客户:')\nprint('- 发送欢迎礼包')\nprint('- 提供首次购买优惠')\nprint('- 引导浏览更多产品')\n\nprint('\\n流失风险客户:')\nprint('- 发送召回优惠券')\nprint('- 了解客户满意度')\nprint('- 提供特别促销活动')\n\nprint('\\n普通客户:')\nprint('- 常规营销活动')\nprint('- 交叉销售推荐')\nprint('- 会员积分激励')"
       }
     ],
     practiceTasks: [
-      "1. 计算每个产品的毛利率（假设成本是售价的60%），并找出毛利率最高的产品",
-      "2. 分析新客户和老客户的消费行为差异，包括客单价、复购率等",
-      "3. 创建一个销售业绩评分系统，对销售员进行综合评分"
+      "1. 使用肘部法则确定最佳聚类数",
+      "2. 为每个客户群命名并描述特征",
+      "3. 分析不同地区的客户群分布"
     ],
     practiceTaskAnswers: [
-      "# 练习1答案：计算产品毛利率\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 计算毛利率\ndf['成本'] = df['单价'] * 0.6\ndf['毛利'] = df['销售额'] - df['成本'] * df['销售数量']\ndf['毛利率'] = (df['毛利'] / df['销售额']) * 100\n\n# 按产品计算平均毛利率\nproduct_margin = df.groupby('产品名称').agg({\n    '毛利率': 'mean',\n    '销售额': 'sum'\n}).round(2)\n\nproduct_margin = product_margin.sort_values('毛利率', ascending=False)\n\nprint('各产品毛利率:')\nprint(product_margin)\n\n# 找出毛利率最高的产品\ntop_product = product_margin.index[0]\ntop_margin = product_margin.loc[top_product, '毛利率']\n\nprint(f'\\n毛利率最高的产品: {top_product} (毛利率: {top_margin:.2f}%)')\n\n# 可视化\nplt.figure(figsize=(12, 6))\nproduct_margin['毛利率'].plot(kind='bar', color='green', alpha=0.7)\nplt.title('各产品毛利率对比')\nplt.xlabel('产品名称')\nplt.ylabel('毛利率 (%)')\nplt.xticks(rotation=45)\nplt.grid(True, alpha=0.3, axis='y')\nplt.tight_layout()\nplt.show()\n",
-      "# 练习2答案：分析新老客户差异\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 假设我们有客户类型字段\n# 计算客单价\ncustomer_stats = df.groupby('客户类型').agg({\n    '销售额': ['mean', 'sum'],\n    '订单编号': 'nunique',\n    '销售数量': 'sum'\n}).round(2)\n\ncustomer_stats.columns = ['平均客单价', '总销售额', '订单数', '总销售数量']\n\nprint('新老客户消费行为差异:')\nprint(customer_stats)\n\n# 计算复购率（假设一个客户多次购买即为复购）\ncustomer_orders = df.groupby(['客户类型', '订单编号']).size().reset_index(name='订单数')\nrepeat_purchase = customer_orders.groupby('客户类型').agg({\n    '订单编号': 'count',\n    '订单数': lambda x: (x > 1).sum()\n})\n\nrepeat_purchase['复购率'] = (repeat_purchase['订单数'] / repeat_purchase['订单编号']) * 100\n\nprint('\n复购率:')\nprint(repeat_purchase[['复购率']].round(2))\n\n# 可视化\nfig, axes = plt.subplots(2, 2, figsize=(16, 10))\n\ncustomer_stats['平均客单价'].plot(kind='bar', ax=axes[0, 0], color='blue', alpha=0.7)\naxes[0, 0].set_title('平均客单价')\n\ncustomer_stats['总销售额'].plot(kind='bar', ax=axes[0, 1], color='green', alpha=0.7)\naxes[0, 1].set_title('总销售额')\n\ncustomer_stats['订单数'].plot(kind='bar', ax=axes[1, 0], color='orange', alpha=0.7)\naxes[1, 0].set_title('订单数')\n\nrepeat_purchase['复购率'].plot(kind='bar', ax=axes[1, 1], color='purple', alpha=0.7)\naxes[1, 1].set_title('复购率 (%)')\n\nfor ax in axes.flat:\n    ax.grid(True, alpha=0.3, axis='y')\n\nplt.tight_layout()\nplt.show()\n",
-      "# 练习3答案：创建销售业绩评分系统\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 计算销售员的各项指标\nsalesperson_metrics = df.groupby('销售员').agg({\n    '销售额': 'sum',\n    '订单编号': 'nunique',\n    '销售数量': 'sum'\n}).reset_index()\n\n# 计算各项指标的得分（标准化）\nfor col in ['销售额', '订单编号', '销售数量']:\n    max_val = salesperson_metrics[col].max()\n    min_val = salesperson_metrics[col].min()\n    salesperson_metrics[f'{col}_得分'] = ((salesperson_metrics[col] - min_val) / (max_val - min_val)) * 100\n\n# 计算综合得分（加权平均）\nweights = {'销售额_得分': 0.5, '订单编号_得分': 0.3, '销售数量_得分': 0.2}\nsalesperson_metrics['综合得分'] = salesperson_metrics.apply(\n    lambda row: sum(row[col] * weight for col, weight in weights.items()), axis=1\n)\n\n# 排序\nsalesperson_metrics = salesperson_metrics.sort_values('综合得分', ascending=False)\n\nprint('销售员业绩评分:')\nprint(salesperson_metrics[['销售员', '销售额', '订单编号', '销售数量', '综合得分']].round(2))\n\n# 可视化\nplt.figure(figsize=(14, 6))\nsalesperson_metrics.set_index('销售员')['综合得分'].plot(kind='bar', color='green', alpha=0.7)\nplt.title('销售员综合业绩评分')\nplt.xlabel('销售员')\nplt.ylabel('综合得分')\nplt.ylim(0, 100)\nplt.grid(True, alpha=0.3, axis='y')\nplt.tight_layout()\nplt.show()\n"
+      "# 练习1答案\nimport pandas as pd\nimport numpy as np\nfrom sklearn.cluster import KMeans\nfrom sklearn.preprocessing import StandardScaler\n\n# 创建模拟数据\nnp.random.seed(42)\nn_customers = 200\ncustomer_data = {\n    'recency_days': np.random.randint(1, 180, n_customers),\n    'frequency': np.random.randint(1, 20, n_customers),\n    'monetary': np.random.uniform(100, 10000, n_customers).round(2)\n}\ncustomer_df = pd.DataFrame(customer_data)\n\nfeatures = customer_df[['recency_days', 'frequency', 'monetary']]\nscaler = StandardScaler()\nfeatures_scaled = scaler.fit_transform(features)\n\n# 肘部法则\ninertias = []\nK_range = range(1, 11)\n\nfor k in K_range:\n    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)\n    kmeans.fit(features_scaled)\n    inertias.append(kmeans.inertia_)\n\nprint('肘部法则结果:')\nfor k, inertia in zip(K_range, inertias):\n    print(f'k={k}, inertia={inertia:.2f}')\n",
+      "# 练习2答案\nprint('客户群命名示例:')\nprint('- 高价值客户: 消费金额高、购买频率高')\nprint('- 潜力客户: 消费中等、频率高')\nprint('- 新客户: 最近购买、消费低')\nprint('- 流失风险客户: 久未购买、消费低')\n",
+      "# 练习3答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\nn_customers = 200\ncustomer_data = {\n    'region': np.random.choice(['华北', '华东', '华南', '西南', '西北'], n_customers),\n    'cluster': np.random.randint(0, 4, n_customers)\n}\ncustomer_df = pd.DataFrame(customer_data)\n\n# 地区分布分析\nregion_cluster = pd.crosstab(customer_df['region'], customer_df['cluster'], normalize='index')\nprint('各地区客户群分布:')\nprint(region_cluster.round(3))\n"
     ],
     assessment: [
-      "1. 什么是同比和环比？它们分别用于什么场景？",
-      "2. 请列举5个常用的电商业务指标，并说明其含义"
+      "1. RFM分别代表什么？如何计算？",
+      "2. K-Means聚类的基本原理是什么？"
     ],
     assessmentAnswers: [
-      "- 同比：与去年同期相比的增长率。例如：2023年1月与2022年1月相比。\n  适用场景：分析长期趋势，排除季节性因素的影响。\n\n- 环比：与上一个周期相比的增长率。例如：2023年1月与2022年12月相比。\n  适用场景：分析短期变化，了解近期业务发展趋势。",
-      "常用的电商业务指标：\n\n1. 销售额：一段时间内的总销售收入。\n2. 订单数：一段时间内的总订单数量。\n3. 客单价：平均每笔订单的金额（销售额/订单数）。\n4. 转化率：从浏览到购买的用户比例（购买用户数/浏览用户数）。\n5. 复购率：重复购买的用户比例（重复购买用户数/总购买用户数）。\n6. 毛利率：毛利润占销售额的比例（(销售额-成本)/销售额）。\n7. 库存周转率：库存更新的速度（销售成本/平均库存）。\n8. 客户获取成本：获取一个新客户的平均成本。\n9. 客户终身价值：客户在生命周期内为企业带来的总价值。\n10. 退换货率：退换货订单占总订单的比例。"
-    ]
+      "RFM的含义：\\n- R(Recency)：最近一次购买距今天数\\n- F(Frequency)：购买频率\\n- M(Monetary)：购买金额\\n\\n计算方法：通常用分位数法将每个指标分成5档，然后组合评分。",
+      "K-Means聚类原理：\\n1. 随机选择k个中心点\\n2. 将每个样本分配到最近的中心点\\n3. 重新计算每个簇的中心点\\n4. 重复步骤2-3直到收敛"
+    ],
+    dataset: {
+      filename: "project4_customers.csv",
+      name: "项目4 - 客户数据",
+      size: "1.2KB",
+      desc: "客户数据，包含购买频率、消费金额、年龄、地区、RFM评分等"
+    }
   },
   {
     id: 5,
-    title: "统计推断与假设检验",
-    description: "学习使用统计方法验证业务假设",
-    goal: "通过A/B测试数据，学习统计推断、假设检验的基本原理和实际应用",
-    dataSource: "A/B测试数据",
-    tools: ["Python", "SciPy", "StatsModels"],
+    title: "数据可视化进阶",
+    description: "创建专业的数据图表",
+    goal: "通过销售数据可视化，学习Matplotlib和Seaborn的高级图表技巧，掌握8种常用数据可视化类型",
+    dataSource: "电商销售数据集",
+    tools: ["Python", "Pandas", "Matplotlib", "Seaborn"],
     learningPoints: [
-      "概率分布基础",
-      "参数估计",
-      "假设检验原理",
-      "t检验和卡方检验",
-      "A/B测试分析"
+      "折线图：展示趋势变化",
+      "柱状图：对比分类数据",
+      "饼图：展示占比分布",
+      "散点图：分析变量关系",
+      "直方图：查看数据分布",
+      "热力图：展示区域差异",
+      "堆叠图：组合数据展示",
+      "面积图：强调累积效果"
     ],
-    overview: "本项目将带你进入统计推断的世界。通过模拟的A/B测试数据，你将学习如何使用统计方法验证业务假设，掌握t检验、卡方检验等常用统计检验方法，并能够独立完成A/B测试的数据分析。",
+    overview: "本项目将带你系统学习数据可视化技巧。通过电商销售数据，你将掌握8种常用的图表类型，能够根据不同的数据特点选择合适的可视化方式，创建专业的数据可视化报告。",
+    duration: "60分钟",
     prerequisites: {
-      tools: ["Python 3.7+", "Jupyter Notebook", "Pandas", "NumPy", "SciPy", "StatsModels"],
-      datasets: ["A/B测试示例数据: https://www.kaggle.com/datasets/zhangluyuan/ab-testing"]
+      tools: ["无前置要求，本项目会从零开始讲解"],
+      datasets: ["项目已内置模拟数据，无需额外下载"]
     },
     stepByStep: [
       {
-        title: "步骤1：环境搭建",
-        content: "安装必要的统计分析库：",
-        code: "pip install pandas numpy scipy statsmodels jupyter"
+        title: "步骤1：创建模拟数据",
+        content: "创建一个模拟的电商销售数据集：",
+        code: "import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# 创建模拟数据\nnp.random.seed(42)\n\n# 时间序列数据\ndates = pd.date_range(start='2024-01-01', periods=12, freq='M')\nproducts = ['电子产品', '服装', '食品', '家居', '图书']\nregions = ['华北', '华东', '华南', '西南']\n\n# 创建销售数据\nsales_data = {\n    'date': np.tile(dates, len(products)),\n    'product': np.repeat(products, len(dates)),\n    'sales': np.concatenate([\n        np.random.normal(500, 100, 12).cumsum() / 2 + 400,\n        np.random.normal(350, 80, 12).cumsum() / 2 + 300,\n        np.random.normal(400, 90, 12).cumsum() / 2 + 350,\n        np.random.normal(250, 70, 12).cumsum() / 2 + 200,\n        np.random.normal(150, 50, 12).cumsum() / 2 + 120\n    ]).round(2)\n}\n\nsales_df = pd.DataFrame(sales_data)\nprint('销售数据创建完成！')\nprint(f'数据形状: {sales_df.shape}')\nprint('\\n前5行数据:')\nprint(sales_df.head())"
       },
       {
-        title: "步骤2：数据生成与探索",
-        content: "生成A/B测试数据并进行初步探索：",
-        code: "import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom scipy import stats\nimport statsmodels.api as sm\nfrom statsmodels.stats.proportion import proportions_ztest\n\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 设置随机种子\nnp.random.seed(42)\n\n# 生成A/B测试数据\n# A组：对照组，使用旧版本\n# B组：实验组，使用新版本\n\nsample_size_a = 1000\nsample_size_b = 1000\n\n# A组转化率：10%\nconversion_a = np.random.binomial(1, 0.10, sample_size_a)\n# B组转化率：12%（提升2%）\nconversion_b = np.random.binomial(1, 0.12, sample_size_b)\n\n# 创建DataFrame\nab_data = pd.DataFrame({\n    '组': ['A'] * sample_size_a + ['B'] * sample_size_b,\n    '是否转化': np.concatenate([conversion_a, conversion_b])\n})\n\nprint('=== A/B测试数据概览 ===')\nprint(ab_data.head())\nprint(f'\\n数据形状: {ab_data.shape}')\n\n# 计算各组转化率\nconversion_rates = ab_data.groupby('组')['是否转化'].agg(['mean', 'count', 'sum'])\nconversion_rates.columns = ['转化率', '样本数', '转化数']\nconversion_rates['转化率'] = conversion_rates['转化率'] * 100\n\nprint('\n=== 各组转化率 ===')\nprint(conversion_rates.round(2))\n\n# 可视化\nplt.figure(figsize=(10, 6))\nconversion_rates['转化率'].plot(kind='bar', color=['blue', 'green'])\nplt.title('A/B组转化率对比', fontsize=14, fontweight='bold')\nplt.ylabel('转化率 (%)')\nplt.ylim(0, 15)\nplt.xticks(rotation=0)\nfor i, v in enumerate(conversion_rates['转化率']):\n    plt.text(i, v + 0.5, f'{v:.2f}%', ha='center', fontsize=12)\nplt.tight_layout()\nplt.show()"
+        title: "步骤2：折线图 - 销售趋势",
+        content: "使用折线图展示产品销售随时间的变化趋势：",
+        code: "# 按产品分组展示趋势\nprint('产品销售趋势:')\nproduct_trends = sales_df.pivot(index='date', columns='product', values='sales')\nprint(product_trends.round(2).head())\n\n# 折线图代码示例\nprint('\\n折线图代码:')\nprint('''\nimport matplotlib.pyplot as plt\n\nplt.figure(figsize=(12, 6))\nfor product in product_trends.columns:\n    plt.plot(product_trends.index, product_trends[product], \n             marker='o', linewidth=2, label=product)\nplt.title('2024年各产品销售趋势', fontsize=16, fontweight='bold')\nplt.xlabel('月份', fontsize=12)\nplt.ylabel('销售额', fontsize=12)\nplt.legend(fontsize=10)\nplt.grid(True, alpha=0.3)\nplt.xticks(rotation=45)\nplt.tight_layout()\nprint('折线图创建完成！')\n''')"
       },
       {
-        title: "步骤3：假设检验 - 双比例Z检验",
-        content: "使用双比例Z检验比较两组转化率：",
-        code: "# 提取数据\ncount_a = conversion_rates.loc['A', '转化数']\ncount_b = conversion_rates.loc['B', '转化数']\nnobs_a = conversion_rates.loc['A', '样本数']\nnobs_b = conversion_rates.loc['B', '样本数']\n\nprint('=== 双比例Z检验 ===')\nprint(f'A组: {count_a}/{nobs_a} 转化')\nprint(f'B组: {count_b}/{nobs_b} 转化')\n\n# 进行Z检验\nz_stat, p_value = proportions_ztest([count_a, count_b], [nobs_a, nobs_b], alternative='smaller')\n\nprint(f'\nZ统计量: {z_stat:.4f}')\nprint(f'P值: {p_value:.6f}')\n\n# 解释结果\nalpha = 0.05\nprint(f'\n显著性水平 α = {alpha}')\nif p_value < alpha:\n    print('结论: 拒绝原假设，B组转化率显著高于A组！')\nelse:\n    print('结论: 无法拒绝原假设，两组转化率无显著差异')\n\n# 计算置信区间\ndef proportion_confint(count, nobs, alpha=0.05):\n    p = count / nobs\n    se = np.sqrt(p * (1 - p) / nobs)\n    z = stats.norm.ppf(1 - alpha / 2)\n    return p - z * se, p + z * se\n\nci_a = proportion_confint(count_a, nobs_a)\nci_b = proportion_confint(count_b, nobs_b)\n\nprint(f'\nA组转化率 95% 置信区间: ({ci_a[0]*100:.2f}%, {ci_a[1]*100:.2f}%)')\nprint(f'B组转化率 95% 置信区间: ({ci_b[0]*100:.2f}%, {ci_b[1]*100:.2f}%)')"
+        title: "步骤3：柱状图 - 产品销量对比",
+        content: "使用柱状图对比不同产品的销量高低：",
+        code: "# 计算各产品总销售额\nproduct_total = sales_df.groupby('product')['sales'].sum().sort_values(ascending=False)\nprint('各产品总销售额:')\nprint(product_total.round(2))\n\n# 柱状图代码示例\nprint('\\n柱状图代码:')\nprint('''\nplt.figure(figsize=(10, 6))\ncolors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444']\nbars = plt.bar(product_total.index, product_total.values, color=colors)\nplt.title('各产品总销售额对比', fontsize=16, fontweight='bold')\nplt.xlabel('产品类别', fontsize=12)\nplt.ylabel('销售额', fontsize=12)\nplt.grid(axis='y', alpha=0.3)\n\n# 添加数值标签\nfor bar in bars:\n    height = bar.get_height()\n    plt.text(bar.get_x() + bar.get_width()/2., height,\n            f'{height:.0f}', ha='center', va='bottom')\nplt.tight_layout()\nprint('柱状图创建完成！')\n''')"
       },
       {
-        title: "步骤4：t检验 - 连续变量比较",
-        content: "使用t检验比较两组的连续变量：",
-        code: "# 生成用户在页面停留时间数据\n# A组：平均停留时间 60秒\n# B组：平均停留时间 70秒\n\ntime_a = np.random.normal(60, 15, sample_size_a)\ntime_b = np.random.normal(70, 15, sample_size_b)\n\n# 确保时间为正数\ntime_a = np.maximum(time_a, 0)\ntime_b = np.maximum(time_b, 0)\n\nprint('=== 页面停留时间分析 ===')\nprint(f'A组平均停留时间: {time_a.mean():.2f}秒 (标准差: {time_a.std():.2f})')\nprint(f'B组平均停留时间: {time_b.mean():.2f}秒 (标准差: {time_b.std():.2f})')\n\n# 可视化分布\nplt.figure(figsize=(12, 6))\nplt.hist(time_a, bins=30, alpha=0.5, label='A组', density=True)\nplt.hist(time_b, bins=30, alpha=0.5, label='B组', density=True)\nplt.xlabel('停留时间（秒）')\nplt.ylabel('密度')\nplt.title('两组用户停留时间分布')\nplt.legend()\nplt.grid(True, alpha=0.3)\nplt.show()\n\n# 进行独立样本t检验（假设方差不等）\nt_stat, p_value_ttest = stats.ttest_ind(time_a, time_b, equal_var=False)\n\nprint(f'\n=== 独立样本t检验 ===')\nprint(f't统计量: {t_stat:.4f}')\nprint(f'P值: {p_value_ttest:.6f}')\n\nif p_value_ttest < alpha:\n    print('结论: 拒绝原假设，两组平均停留时间存在显著差异！')\nelse:\n    print('结论: 无法拒绝原假设，两组平均停留时间无显著差异')"
+        title: "步骤4：饼图 - 市场占有率",
+        content: "使用饼图展示各产品占总体的比例：",
+        code: "# 计算占比\nproduct_pct = product_total / product_total.sum() * 100\nprint('各产品销售额占比:')\nprint(product_pct.round(1))\n\n# 饼图代码示例\nprint('\\n饼图代码:')\nprint('''\nplt.figure(figsize=(10, 8))\ncolors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444']\nexplode = (0.05, 0, 0, 0, 0)\nplt.pie(product_total.values, explode=explode, labels=product_total.index, \n        colors=colors, autopct='%1.1f%%', shadow=True, startangle=90)\nplt.title('各产品销售额占比', fontsize=16, fontweight='bold')\nplt.axis('equal')\nplt.tight_layout()\nprint('饼图创建完成！')\n''')"
+      },
+      {
+        title: "步骤5：散点图 - 变量关系",
+        content: "使用散点图分析两个变量之间的关系：",
+        code: "# 创建模拟的广告投入数据\nnp.random.seed(42)\nad_spend = np.random.uniform(50, 200, 60)\nsales_revenue = ad_spend * 1.5 + np.random.normal(0, 20, 60)\n\nprint('广告投入与销售额关系（样本）:')\nprint(pd.DataFrame({'广告投入': ad_spend[:5], '销售额': sales_revenue[:5]}).round(2))\n\n# 散点图代码示例\nprint('\\n散点图代码:')\nprint('''\nplt.figure(figsize=(10, 6))\nplt.scatter(ad_spend, sales_revenue, alpha=0.6, s=100, \n            c='#3b82f6', edgecolors='white', linewidths=1.5)\nplt.title('广告投入与销售额关系', fontsize=16, fontweight='bold')\nplt.xlabel('广告投入（万元）', fontsize=12)\nplt.ylabel('销售额（万元）', fontsize=12)\nplt.grid(True, alpha=0.3)\n\n# 添加趋势线\nz = np.polyfit(ad_spend, sales_revenue, 1)\np = np.poly1d(z)\nplt.plot(ad_spend, p(ad_spend), \"r--\", alpha=0.8, linewidth=2, label='趋势线')\nplt.legend()\nplt.tight_layout()\nprint('散点图创建完成！')\n''')"
+      },
+      {
+        title: "步骤6：直方图 - 数据分布",
+        content: "使用直方图展示数据的分布情况：",
+        code: "# 模拟用户年龄数据\nnp.random.seed(42)\nuser_ages = np.random.normal(35, 10, 1000)\nprint('用户年龄统计:')\nprint(f'平均年龄: {user_ages.mean():.1f}岁')\nprint(f'年龄范围: {user_ages.min():.1f} - {user_ages.max():.1f}岁')\n\n# 直方图代码示例\nprint('\\n直方图代码:')\nprint('''\nplt.figure(figsize=(10, 6))\nn, bins, patches = plt.hist(user_ages, bins=30, \n                            color='#8b5cf6', alpha=0.7, \n                            edgecolor='white', linewidth=1)\nplt.title('用户年龄分布', fontsize=16, fontweight='bold')\nplt.xlabel('年龄', fontsize=12)\nplt.ylabel('人数', fontsize=12)\nplt.grid(axis='y', alpha=0.3)\n\n# 添加平均年龄线\nmean_age = user_ages.mean()\nplt.axvline(mean_age, color='red', linestyle='--', \n            linewidth=2, label=f'平均年龄: {mean_age:.1f}')\nplt.legend()\nplt.tight_layout()\nprint('直方图创建完成！')\n''')"
+      },
+      {
+        title: "步骤7：热力图 - 区域差异",
+        content: "使用热力图用颜色深浅展示区域差异：",
+        code: "# 创建区域月度销售数据\nnp.random.seed(42)\nmonths = ['1月', '2月', '3月', '4月', '5月', '6月', \n          '7月', '8月', '9月', '10月', '11月', '12月']\nregion_sales = np.random.randint(50, 200, (4, 12))\nregion_sales_df = pd.DataFrame(region_sales, index=regions, columns=months)\nprint('区域月度销售额:')\nprint(region_sales_df)\n\n# 热力图代码示例\nprint('\\n热力图代码:')\nprint('''\nplt.figure(figsize=(14, 6))\nsns.heatmap(region_sales_df, annot=True, fmt='d', cmap='YlOrRd', \n            linewidths=0.5, cbar_kws={'label': '销售额(万)'})\nplt.title('各区域月度销售热力图', fontsize=16, fontweight='bold')\nplt.xlabel('月份', fontsize=12)\nplt.ylabel('地区', fontsize=12)\nplt.tight_layout()\nprint('热力图创建完成！')\n''')"
+      },
+      {
+        title: "步骤8：堆叠柱状图 - 组合数据",
+        content: "使用堆叠柱状图展示整体和各部分的数量：",
+        code: "# 创建线上线下销售数据\nquarterly_data = pd.DataFrame({\n    '季度': ['Q1', 'Q2', 'Q3', 'Q4'],\n    '线上': [120, 150, 180, 220],\n    '线下': [80, 90, 85, 75]\n})\nprint('季度销售数据:')\nprint(quarterly_data)\n\n# 堆叠图代码示例\nprint('\\n堆叠柱状图代码:')\nprint('''\nplt.figure(figsize=(10, 6))\nplt.bar(quarterly_data['季度'], quarterly_data['线上'], \n        label='线上销售', color='#3b82f6')\nplt.bar(quarterly_data['季度'], quarterly_data['线下'], \n        bottom=quarterly_data['线上'], label='线下销售', color='#8b5cf6')\nplt.title('季度销售对比（线上vs线下）', fontsize=16, fontweight='bold')\nplt.xlabel('季度', fontsize=12)\nplt.ylabel('销售额（万元）', fontsize=12)\nplt.legend()\nplt.grid(axis='y', alpha=0.3)\nplt.tight_layout()\nprint('堆叠柱状图创建完成！')\n''')"
+      },
+      {
+        title: "步骤9：面积图 - 累积效果",
+        content: "使用面积图强调数据的累积效果：",
+        code: "# 累积用户增长数据\nmonthly_users = pd.DataFrame({\n    '月份': months,\n    '累积用户': [100, 250, 450, 720, 1050, 1450, \n                  1900, 2400, 2950, 3550, 4200, 4900]\n})\nprint('累积用户增长数据:')\nprint(monthly_users)\n\n# 面积图代码示例\nprint('\\n面积图代码:')\nprint('''\nplt.figure(figsize=(12, 6))\nplt.fill_between(range(len(monthly_users)), monthly_users['累积用户'], \n                 alpha=0.3, color='#3b82f6')\nplt.plot(range(len(monthly_users)), monthly_users['累积用户'], \n         marker='o', linewidth=2, color='#3b82f6', markersize=8)\nplt.title('2024年累积用户增长趋势', fontsize=16, fontweight='bold')\nplt.xlabel('月份', fontsize=12)\nplt.ylabel('累积用户数', fontsize=12)\nplt.xticks(range(len(monthly_users)), monthly_users['月份'], rotation=45)\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nprint('面积图创建完成！')\n''')"
+      },
+      {
+        title: "步骤10：图表选择指南",
+        content: "了解如何根据数据特点选择合适的图表类型：",
+        code: "# 数据可视化黄金法则\nprint('=' * 60)\nprint('数据可视化图表选择指南')\nprint('=' * 60)\nprint('\\n1. 趋势分析 → 折线图:')\nprint('   适用：展示数据随时间变化的趋势')\nprint('   示例：销售趋势、用户增长、股价变化')\n\nprint('\\n2. 对比分析 → 柱状图:')\nprint('   适用：对比不同类别的数值大小')\nprint('   示例：产品销量对比、地区销售额对比')\n\nprint('\\n3. 占比分析 → 饼图:')\nprint('   适用：展示各部分占总体的比例')\nprint('   示例：市场份额、收入构成、用户分布')\n\nprint('\\n4. 关系分析 → 散点图:')\nprint('   适用：分析两个变量之间的关系')\nprint('   示例：广告与销售额、价格与销量')\n\nprint('\\n5. 分布分析 → 直方图:')\nprint('   适用：查看数据的分布情况')\nprint('   示例：年龄分布、收入分布、考试成绩')\n\nprint('\\n6. 区域差异 → 热力图:')\nprint('   适用：用颜色深浅展示矩阵数据')\nprint('   示例：区域销售、用户活跃度矩阵')\n\nprint('\\n7. 组合分析 → 堆叠图:')\nprint('   适用：同时展示整体和部分')\nprint('   示例：线上线下销售、多产品组合')\n\nprint('\\n8. 累积效果 → 面积图:')\nprint('   适用：强调数据的累积和趋势')\nprint('   示例：累积用户、累计收入')\n\nprint('\\n' + '=' * 60)\nprint('选择原则：先明确你想展示什么，再选合适的图表！')\nprint('=' * 60)"
       }
     ],
     practiceTasks: [
-      "1. 设计一个A/B测试方案，测试网站首页改版对转化率的影响",
-      "2. 使用统计方法分析不同营销渠道的用户质量差异",
-      "3. 计算A/B测试所需的最小样本量，确保测试结果的统计显著性"
+      "1. 创建一个折线图展示某产品的月度销售趋势",
+      "2. 使用柱状图对比不同产品的总销售额",
+      "3. 为你选择的数据选择合适的图表类型并解释原因"
     ],
     practiceTaskAnswers: [
-      "# 练习1答案：设计A/B测试方案\n\n## A/B测试设计方案\n\n### 1. 测试目标\n- 测试网站首页改版对转化率的影响\n- 转化率定义：访问首页后完成注册或购买的用户比例\n\n### 2. 测试设计\n- **实验组(A)**: 现有首页\n- **对照组(B)**: 改版后首页\n- **分流比例**: 50%:50%\n- **测试时长**: 2周\n\n### 3. 数据收集\n- 记录每个用户的分组情况\n- 记录每个用户的行为：是否访问首页、是否完成转化\n\n### 4. 数据分析\n```python\nimport pandas as pd\nfrom statsmodels.stats.proportion import proportions_ztest\n\n# 假设收集到的数据\ndata = {\n    'group': ['A']*1000 + ['B']*1000,\n    'converted': [100] + [0]*900 + [120] + [0]*880\n}\n\ndf = pd.DataFrame(data)\n\n# 计算转化数和样本数\nconversions = df.groupby('group')['converted'].sum()\nsample_sizes = df.groupby('group')['converted'].count()\n\n# 进行Z检验\nz_stat, p_value = proportions_ztest(\n    [conversions['A'], conversions['B']],\n    [sample_sizes['A'], sample_sizes['B']]\n)\n\nprint(f'Z统计量: {z_stat:.4f}')\nprint(f'P值: {p_value:.6f}')\n\nif p_value < 0.05:\n    print('结论: 拒绝原假设，两组转化率存在显著差异')\nelse:\n    print('结论: 无法拒绝原假设，两组转化率无显著差异')\n```\n",
-      "# 练习2答案：分析不同营销渠道的用户质量差异\nimport pandas as pd\nimport numpy as np\nfrom scipy import stats\nimport matplotlib.pyplot as plt\n\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\n# 假设数据\nchannels = ['社交媒体', '搜索引擎', '邮件营销', '直接访问']\n\n# 生成模拟数据\ndata = []\nfor channel in channels:\n    # 不同渠道的用户质量不同\n    if channel == '社交媒体':\n        purchases = np.random.binomial(1, 0.08, 500)\n        spend = np.random.normal(120, 30, 500)\n    elif channel == '搜索引擎':\n        purchases = np.random.binomial(1, 0.12, 800)\n        spend = np.random.normal(150, 40, 800)\n    elif channel == '邮件营销':\n        purchases = np.random.binomial(1, 0.15, 300)\n        spend = np.random.normal(180, 50, 300)\n    else:  # 直接访问\n        purchases = np.random.binomial(1, 0.20, 400)\n        spend = np.random.normal(200, 60, 400)\n    \n    data.extend([(channel, p, s if p == 1 else 0) for p, s in zip(purchases, spend)])\n\ndf = pd.DataFrame(data, columns=['渠道', '是否购买', '消费金额'])\n\n# 分析转化率\nconversion_rates = df.groupby('渠道')['是否购买'].mean() * 100\nprint('各渠道转化率:')\nprint(conversion_rates.round(2))\n\n# 分析平均消费金额（仅购买用户）\naverage_spend = df[df['是否购买'] == 1].groupby('渠道')['消费金额'].mean()\nprint('\n各渠道平均消费金额:')\nprint(average_spend.round(2))\n\n# 方差分析（ANOVA）\nsamples = [df[df['渠道'] == channel]['是否购买'] for channel in channels]\nf_stat, p_value = stats.f_oneway(*samples)\n\nprint(f'\n转化率方差分析:')\nprint(f'F统计量: {f_stat:.4f}')\nprint(f'P值: {p_value:.6f}')\n\nif p_value < 0.05:\n    print('结论: 不同渠道的转化率存在显著差异')\nelse:\n    print('结论: 不同渠道的转化率无显著差异')\n\n# 可视化\nfig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))\n\nconversion_rates.plot(kind='bar', ax=ax1, color='green', alpha=0.7)\nax1.set_title('各渠道转化率')\nax1.set_ylabel('转化率 (%)')\nax1.grid(True, alpha=0.3, axis='y')\n\naverage_spend.plot(kind='bar', ax=ax2, color='blue', alpha=0.7)\nax2.set_title('各渠道平均消费金额')\nax2.set_ylabel('金额')\nax2.grid(True, alpha=0.3, axis='y')\n\nplt.tight_layout()\nplt.show()\n",
-      "# 练习3答案：计算A/B测试最小样本量\nimport numpy as np\nfrom scipy.stats import norm\n\ndef calculate_sample_size(baseline_conversion, minimum_detectable_effect, alpha=0.05, power=0.8):\n    \"\"\"\n    计算A/B测试所需的最小样本量\n    \n    参数:\n    baseline_conversion: 基线转化率\n    minimum_detectable_effect: 最小可检测效果（相对变化）\n    alpha: 显著性水平\n    power: 检验功效\n    \n    返回:\n    每组所需的样本量\n    \"\"\"\n    # 计算效应大小\n    p1 = baseline_conversion\n    p2 = baseline_conversion * (1 + minimum_detectable_effect)\n    \n    # 计算合并比例\n    p = (p1 + p2) / 2\n    \n    # 计算临界值\n    z_alpha = norm.ppf(1 - alpha / 2)\n    z_beta = norm.ppf(power)\n    \n    # 计算样本量\n    numerator = (z_alpha * np.sqrt(2 * p * (1 - p)) + z_beta * np.sqrt(p1 * (1 - p1) + p2 * (1 - p2))) ** 2\n    denominator = (p2 - p1) ** 2\n    \n    sample_size = int(np.ceil(numerator / denominator))\n    \n    return sample_size\n\n# 示例计算\nbaseline_conversion = 0.10  # 10%的基线转化率\nminimum_detectable_effect = 0.20  # 20%的相对提升\n\nsample_size = calculate_sample_size(baseline_conversion, minimum_detectable_effect)\n\nprint(f'基线转化率: {baseline_conversion*100:.1f}%')\nprint(f'最小可检测效果: {minimum_detectable_effect*100:.1f}%')\nprint(f'每组所需样本量: {sample_size}')\nprint(f'总样本量: {sample_size * 2}')\n"
+      "# 练习1答案\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nnp.random.seed(42)\ndates = pd.date_range(start='2024-01-01', periods=12, freq='M')\nsales = np.random.normal(500, 100, 12).cumsum() / 2 + 400\n\nplt.figure(figsize=(12, 6))\nplt.plot(dates, sales, marker='o', linewidth=2, color='#3b82f6')\nplt.title('产品销售趋势', fontsize=16, fontweight='bold')\nplt.xlabel('月份', fontsize=12)\nplt.ylabel('销售额', fontsize=12)\nplt.grid(True, alpha=0.3)\nplt.xticks(rotation=45)\nplt.tight_layout()\nprint('折线图练习完成！')\n",
+      "# 练习2答案\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nproducts = ['电子产品', '服装', '食品', '家居', '图书']\nsales = [4500, 3800, 5200, 2900, 1800]\n\nplt.figure(figsize=(10, 6))\ncolors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444']\nbars = plt.bar(products, sales, color=colors)\nplt.title('各产品总销售额对比', fontsize=16, fontweight='bold')\nplt.xlabel('产品', fontsize=12)\nplt.ylabel('销售额', fontsize=12)\nplt.grid(axis='y', alpha=0.3)\n\nfor bar in bars:\n    height = bar.get_height()\n    plt.text(bar.get_x() + bar.get_width()/2., height,\n            f'{height}', ha='center', va='bottom')\nplt.tight_layout()\nprint('柱状图练习完成！')\n",
+      "# 练习3答案\nprint('图表选择练习:')\nprint('\\n如果要展示数据随时间的变化 → 折线图')\nprint('如果要对比不同类别的数值 → 柱状图')\nprint('如果要展示各部分占比 → 饼图')\nprint('如果要分析两个变量关系 → 散点图')\nprint('如果要查看数据分布 → 直方图')\nprint('\\n关键是：先确定想展示什么信息，再选图表！')\n"
     ],
     assessment: [
-      "1. 什么是原假设和备择假设？请举例说明",
-      "2. P值的含义是什么？如何根据P值判断结果是否显著？"
+      "1. 列举3种常用的图表类型及其适用场景",
+      "2. 数据可视化的黄金法则是什么？"
     ],
     assessmentAnswers: [
-      "- 原假设（H0）：假设两个或多个变量之间没有差异或关系。\n  例如：A/B测试中，原假设是两组的转化率没有显著差异。\n\n- 备择假设（H1）：假设两个或多个变量之间存在差异或关系。\n  例如：A/B测试中，备择假设是两组的转化率存在显著差异。",
-      "P值是在原假设为真的情况下，观察到的结果或更极端结果出现的概率。\n\n判断标准：\n- 如果P值 < 显著性水平（通常为0.05），则拒绝原假设，认为结果显著。\n- 如果P值 >= 显著性水平，则无法拒绝原假设，认为结果不显著。\n\n例如：P值=0.03 < 0.05，拒绝原假设，认为两组存在显著差异。"
-    ]
+      "常用图表类型：\\n1. 折线图：展示数据随时间的变化趋势\\n2. 柱状图：对比不同类别的数值大小\\n3. 饼图：展示各部分占总体的比例\\n4. 散点图：分析两个变量之间的关系\\n5. 直方图：查看数据的分布情况",
+      "数据可视化黄金法则：\\n1. 先明确想展示什么信息，再选图表\\n2. 选择最能清晰传达信息的图表类型\\n3. 保持图表简洁，删除不必要的装饰\\n4. 使用合适的颜色，避免过于花哨\\n5. 添加清晰的标签和标题"
+    ],
+    dataset: {
+      filename: "project5_time_series.csv",
+      name: "项目5 - 时间序列数据",
+      size: "1.0KB",
+      desc: "销售时间序列数据，包含日期、销售额、产品类别等"
+    }
   },
   {
     id: 6,
-    title: "机器学习基础应用",
-    description: "构建客户流失预测模型",
-    goal: "通过客户流失数据，学习机器学习的完整流程，包括数据预处理、特征工程、模型训练和评估",
-    dataSource: "客户流失数据",
-    tools: ["Python", "Scikit-learn", "Pandas"],
+    title: "A/B测试数据分析",
+    description: "学习实验设计和分析",
+    goal: "通过A/B测试数据，学习实验设计、假设检验、p值解读和统计显著性分析",
+    dataSource: "A/B测试数据集",
+    tools: ["Python", "Pandas", "SciPy"],
     learningPoints: [
-      "数据预处理",
-      "特征工程",
-      "分类算法",
-      "模型评估",
-      "模型优化"
+      "实验设计基础",
+      "假设检验",
+      "p值解读",
+      "置信区间",
+      "统计功效分析"
     ],
-    overview: "本项目将带你体验机器学习的完整流程。通过构建客户流失预测模型，你将学习如何使用Scikit-learn进行数据预处理、特征工程、模型训练和评估，掌握逻辑回归、随机森林等常用分类算法。",
+    overview: "本项目将带你学习A/B测试的完整流程。通过实际的A/B测试数据，你将掌握实验设计、假设检验、p值解读等统计技能，能够科学评估产品改进的效果。",
+    duration: "45分钟",
     prerequisites: {
-      tools: ["Python 3.7+", "Jupyter Notebook", "Pandas", "NumPy", "Scikit-learn", "Matplotlib", "Seaborn"],
-      datasets: ["电信客户流失数据集: https://www.kaggle.com/datasets/blastchar/telco-customer-churn"]
+      tools: ["无前置要求，本项目会从零开始讲解"],
+      datasets: ["项目已内置模拟数据，无需额外下载"]
     },
     stepByStep: [
       {
-        title: "步骤1：环境搭建",
-        content: "安装机器学习相关库：",
-        code: "pip install pandas numpy scikit-learn matplotlib seaborn jupyter"
+        title: "步骤1：创建模拟数据",
+        content: "创建一个模拟的A/B测试数据集：",
+        code: "import pandas as pd\nimport numpy as np\nfrom scipy import stats\n\n# 创建模拟A/B测试数据\nnp.random.seed(42)\n\nn_control = 5000\nn_treatment = 5000\n\n# 对照组：转化率10%\ncontrol_conversions = np.random.binomial(1, 0.10, n_control)\n# 实验组：转化率12%\ntreatment_conversions = np.random.binomial(1, 0.12, n_treatment)\n\n# 创建DataFrame\nab_data = {\n    'user_id': np.arange(1, n_control + n_treatment + 1),\n    'group': ['control'] * n_control + ['treatment'] * n_treatment,\n    'conversion': np.concatenate([control_conversions, treatment_conversions])\n}\n\nab_df = pd.DataFrame(ab_data)\n\nprint('A/B测试数据创建完成！')\nprint(f'数据形状: {ab_df.shape}')\nprint('\\n前5行数据:')\nprint(ab_df.head())\nprint('\\n分组统计:')\nprint(ab_df['group'].value_counts())"
+      },
+      {
+        title: "步骤2：探索性分析",
+        content: "先看一下两组的基本情况：",
+        code: "import pandas as pd\nimport numpy as np\nfrom scipy import stats\n\n# 创建模拟A/B测试数据（独立运行）\nnp.random.seed(42)\nn_control = 5000\nn_treatment = 5000\ncontrol_conversions = np.random.binomial(1, 0.10, n_control)\ntreatment_conversions = np.random.binomial(1, 0.12, n_treatment)\nab_data = {\n    'user_id': np.arange(1, n_control + n_treatment + 1),\n    'group': ['control'] * n_control + ['treatment'] * n_treatment,\n    'conversion': np.concatenate([control_conversions, treatment_conversions])\n}\nab_df = pd.DataFrame(ab_data)\n\n# 查看分组情况\nprint('分组情况:')\nprint(ab_df['group'].value_counts())\n\n# 查看指标对比\nif 'conversion' in ab_df.columns:\n    group_stats = ab_df.groupby('group')['conversion'].agg(['count', 'mean', 'sum'])\n    group_stats.columns = ['样本量', '转化率', '转化数']\n    print('\\n转化率统计:')\n    print(group_stats.round(4))\n    \n    # 计算提升率\n    control_rate = group_stats.loc['control', '转化率']\n    treatment_rate = group_stats.loc['treatment', '转化率']\n    lift = (treatment_rate - control_rate) / control_rate * 100\n    print(f'\\n提升率: {lift:.2f}%')"
+      },
+      {
+        title: "步骤3：假设检验",
+        content: "进行卡方检验：",
+        code: "import pandas as pd\nimport numpy as np\nfrom scipy import stats\n\n# 创建模拟A/B测试数据（独立运行）\nnp.random.seed(42)\nn_control = 5000\nn_treatment = 5000\ncontrol_conversions = np.random.binomial(1, 0.10, n_control)\ntreatment_conversions = np.random.binomial(1, 0.12, n_treatment)\nab_data = {\n    'user_id': np.arange(1, n_control + n_treatment + 1),\n    'group': ['control'] * n_control + ['treatment'] * n_treatment,\n    'conversion': np.concatenate([control_conversions, treatment_conversions])\n}\nab_df = pd.DataFrame(ab_data)\n\n# 卡方检验\nif all(col in ab_df.columns for col in ['group', 'conversion']):\n    contingency_table = pd.crosstab(ab_df['group'], ab_df['conversion'])\n    print('列联表:')\n    print(contingency_table)\n    \n    chi2, p_value, dof, expected = stats.chi2_contingency(contingency_table)\n    \n    print(f'\\n卡方检验结果:')\n    print(f'卡方值: {chi2:.4f}')\n    print(f'p值: {p_value:.6f}')\n    print(f'自由度: {dof}')\n    \n    if p_value < 0.05:\n        print('\\n结论: 结果具有统计显著性 (p < 0.05)！')\n        print('实验组效果显著优于对照组。')\n    else:\n        print('\\n结论: 结果不具有统计显著性 (p >= 0.05)')\n        print('两组之间没有显著差异。')"
+      },
+      {
+        title: "步骤4：置信区间",
+        content: "计算转化率的置信区间：",
+        code: "import pandas as pd\nimport numpy as np\nfrom scipy import stats\n\n# 创建模拟A/B测试数据（独立运行）\nnp.random.seed(42)\nn_control = 5000\nn_treatment = 5000\ncontrol_conversions = np.random.binomial(1, 0.10, n_control)\ntreatment_conversions = np.random.binomial(1, 0.12, n_treatment)\nab_data = {\n    'user_id': np.arange(1, n_control + n_treatment + 1),\n    'group': ['control'] * n_control + ['treatment'] * n_treatment,\n    'conversion': np.concatenate([control_conversions, treatment_conversions])\n}\nab_df = pd.DataFrame(ab_data)\n\n# 计算转化率的置信区间\nif all(col in ab_df.columns for col in ['group', 'conversion']):\n    control = ab_df[ab_df['group'] == 'control']['conversion']\n    treatment = ab_df[ab_df['group'] == 'treatment']['conversion']\n    \n    def proportion_confidence_interval(successes, trials, confidence=0.95):\n        import math\n        p = successes / trials\n        z = stats.norm.ppf((1 + confidence) / 2)\n        se = math.sqrt(p * (1 - p) / trials)\n        return p - z * se, p + z * se\n    \n    control_success = control.sum()\n    control_trials = len(control)\n    control_ci = proportion_confidence_interval(control_success, control_trials)\n    \n    treatment_success = treatment.sum()\n    treatment_trials = len(treatment)\n    treatment_ci = proportion_confidence_interval(treatment_success, treatment_trials)\n    \n    print('转化率置信区间 (95%):')\n    print(f'对照组: {control.mean():.4f} [{control_ci[0]:.4f}, {control_ci[1]:.4f}]')\n    print(f'实验组: {treatment.mean():.4f} [{treatment_ci[0]:.4f}, {treatment_ci[1]:.4f}]')\n    \n    diff = treatment.mean() - control.mean()\n    se_diff = np.sqrt((control.mean() * (1 - control.mean()) / control_trials) + \n                     (treatment.mean() * (1 - treatment.mean()) / treatment_trials))\n    diff_ci = (diff - 1.96 * se_diff, diff + 1.96 * se_diff)\n    \n    print(f'\\n差值 (实验组-对照组): {diff:.4f}')\n    print(f'差值置信区间: [{diff_ci[0]:.4f}, {diff_ci[1]:.4f}]')\n    \n    if diff_ci[0] > 0:\n        print('\\n置信区间不包含0，说明差异显著！')\n    else:\n        print('\\n置信区间包含0，差异可能不显著。')"
+      },
+      {
+        title: "步骤5：结果解读",
+        content: "完整解读A/B测试结果：",
+        code: "import pandas as pd\nimport numpy as np\nfrom scipy import stats\n\n# 创建模拟A/B测试数据（独立运行）\nnp.random.seed(42)\nn_control = 5000\nn_treatment = 5000\ncontrol_conversions = np.random.binomial(1, 0.10, n_control)\ntreatment_conversions = np.random.binomial(1, 0.12, n_treatment)\nab_data = {\n    'user_id': np.arange(1, n_control + n_treatment + 1),\n    'group': ['control'] * n_control + ['treatment'] * n_treatment,\n    'conversion': np.concatenate([control_conversions, treatment_conversions])\n}\nab_df = pd.DataFrame(ab_data)\n\n# 完整的结果解读\nprint('=' * 60)\nprint('A/B测试结果报告')\nprint('=' * 60)\n\ncontrol = ab_df[ab_df['group'] == 'control']['conversion']\ntreatment = ab_df[ab_df['group'] == 'treatment']['conversion']\n\nprint(f'\\n1. 实验配置:')\nprint(f'   对照组样本量: {len(control)}')\nprint(f'   实验组样本量: {len(treatment)}')\n\nprint(f'\\n2. 核心指标:')\nprint(f'   对照组转化率: {control.mean():.2%}')\nprint(f'   实验组转化率: {treatment.mean():.2%}')\nprint(f'   绝对提升: {(treatment.mean() - control.mean()):.2%}')\nprint(f'   相对提升: {((treatment.mean() - control.mean()) / control.mean() * 100):.2f}%')\n\ncontingency_table = pd.crosstab(ab_df['group'], ab_df['conversion'])\nchi2, p_value, dof, expected = stats.chi2_contingency(contingency_table)\n\nprint(f'\\n3. 统计检验:')\nprint(f'   p值: {p_value:.6f}')\n\nif p_value < 0.05:\n    print(f'   结论: 统计显著 ✓')\n    print(f'   建议: 可以上线实验组方案')\nelse:\n    print(f'   结论: 统计不显著 ✗')\n    print(f'   建议: 需要更多数据或重新设计实验')\n\nprint('\\n' + '=' * 60)\nprint('报告结束')\nprint('=' * 60)"
       }
     ],
     practiceTasks: [
-      "1. 尝试使用XGBoost或LightGBM等进阶算法，看是否能提升模型性能",
-      "2. 进行特征选择，找出最关键的预测因素",
-      "3. 为模型添加业务解释，说明哪些客户特征最容易导致流失"
+      "1. 计算最小检测效应所需的样本量",
+      "2. 分析如果只收集一半数据结果会怎样",
+      "3. 解释统计显著性和实际显著性的区别"
     ],
     practiceTaskAnswers: [
-      "# 练习1答案：使用XGBoost算法\nimport pandas as pd\nimport numpy as np\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import StandardScaler, LabelEncoder\nfrom sklearn.metrics import classification_report, roc_auc_score, accuracy_score\n\nprint('=== XGBoost模型评估 ===')\nprint(f'准确率: {0.85:.4f}')\nprint(f'AUC: {0.88:.4f}')\nprint('\n分类报告:')\nprint('              precision    recall  f1-score   support')\nprint('           0       0.87      0.95      0.91      3096')\nprint('           1       0.75      0.52      0.61       899')\nprint('\n    accuracy                           0.85      3995')\nprint('   macro avg       0.81      0.73      0.76      3995')\nprint('weighted avg       0.84      0.85      0.84      3995')\n"
+      "# 练习1答案\nimport numpy as np\nfrom scipy import stats\n\n# 样本量计算函数\ndef calculate_sample_size(baseline_rate, min_effect, alpha=0.05, power=0.8):\n    \"\"\"计算A/B测试所需样本量\"\"\"\n    z_alpha = stats.norm.ppf(1 - alpha/2)\n    z_power = stats.norm.ppf(power)\n    \n    p1 = baseline_rate\n    p2 = baseline_rate * (1 + min_effect)\n    \n    # 合并方差\n    p_pool = (p1 + p2) / 2\n    \n    # 样本量公式\n    n = ((z_alpha * np.sqrt(2 * p_pool * (1 - p_pool)) + \n         z_power * np.sqrt(p1 * (1 - p1) + p2 * (1 - p2))) ** 2) / (p2 - p1) ** 2\n    \n    return int(np.ceil(n))\n\n# 参数\nbaseline = 0.10  # 基准转化率10%\neffect = 0.20    # 期望检测到20%的提升\n\nsample_size = calculate_sample_size(baseline, effect)\nprint(f'每组需要样本量: {sample_size}')\nprint(f'总共需要: {sample_size * 2}')\n",
+      "# 练习2答案\nprint('样本量不足的影响:')\nprint('1. p值变大，可能无法检测到真实效应')\nprint('2. 置信区间变宽，结论不确定')\nprint('3. 统计功效降低（第二类错误概率增加）')\nprint('4. 即使显著，效应估计也可能不准确')\n",
+      "# 练习3答案\nprint('统计显著性 vs 实际显著性:')\nprint('\\n统计显著性:')\nprint('- p值 < 0.05，结果不太可能是偶然')\nprint('- 关注结果是否可信')\n\nprint('\\n实际显著性:')\nprint('- 效应大小是否有实际业务价值')\nprint('- 关注结果是否重要')\n\nprint('\\n例子:')\nprint('即使统计显著，但转化率只提升0.1%，')\nprint('如果成本很高，可能不值得投入。')\n"
     ],
     assessment: [
-      "1. 什么是过拟合？如何避免过拟合？",
-      "2. 准确率和AUC有什么区别？为什么AUC更适合评估不平衡数据？"
+      "1. 什么是第一类错误和第二类错误？",
+      "2. 解释p值的含义"
     ],
     assessmentAnswers: [
-      "过拟合是指模型在训练数据上表现很好，但在新数据上表现很差的现象。\n\n避免过拟合的方法：\n1. 增加训练数据量\n2. 减少特征数量（特征选择）\n3. 使用正则化（L1、L2正则）\n4. 使用交叉验证\n5. 早停法（Early Stopping）\n6. 集成学习（如随机森林）\n7. 数据增强",
-      "准确率是分类正确的样本数占总样本数的比例。\nAUC是ROC曲线下的面积，衡量模型区分正例和负例的能力。\n\nAUC更适合评估不平衡数据的原因：\n- 准确率会被多数类主导，例如当90%是负例时，即使全部预测为负例，准确率也有90%\n- AUC关注的是模型对正例和负例的区分能力，不受类别不平衡的影响\n- AUC值范围在0.5-1之间，越接近1说明模型性能越好"
-    ]
+      "第一类错误和第二类错误：\\n- 第一类错误(α)：原假设为真时拒绝原假设（假阳性）\\n- 第二类错误(β)：原假设为假时接受原假设（假阴性）\\n- 统计功效 = 1 - β",
+      "p值的含义：\\n- 在原假设成立的情况下，观察到当前结果或更极端结果的概率\\n- p值小≠效应大，只是表示结果不太可能是偶然\\n- 通常p<0.05被认为具有统计显著性"
+    ],
+    dataset: {
+      filename: "project6_ab_test.csv",
+      name: "项目6 - A/B测试数据",
+      size: "0.6KB",
+      desc: "A/B测试数据，包含用户ID、分组、转化结果等"
+    }
   },
   {
     id: 7,
-    title: "时间序列分析",
-    description: "预测股票价格或销售趋势",
-    goal: "通过股价或销售数据，学习时间序列分析的基本方法，包括趋势分析、季节性分析和预测建模",
-    dataSource: "股价或销售数据",
-    tools: ["Python", "StatsModels", "Prophet", "Pandas"],
+    title: "销售预测建模",
+    description: "学习时间序列预测",
+    goal: "通过历史销售数据，学习时间序列分析、移动平均和简单预测模型构建",
+    dataSource: "时间序列销售数据集",
+    tools: ["Python", "Pandas", "NumPy"],
     learningPoints: [
       "时间序列分解",
-      "趋势分析",
-      "季节性分析",
-      "ARIMA模型",
-      "Prophet预测"
+      "移动平均法",
+      "指数平滑",
+      "预测准确性评估"
     ],
-    overview: "本项目将带你学习时间序列分析的核心技术。通过股价数据和销售数据，你将掌握时间序列分解、趋势和季节性分析，以及使用ARIMA和Prophet进行预测的方法，能够独立完成时间序列预测任务。",
+    overview: "本项目将带你学习时间序列预测。通过销售历史数据，你将掌握时间序列分解、移动平均、指数平滑等预测方法，能够构建准确的销售预测模型。",
+    duration: "45分钟",
     prerequisites: {
-      tools: ["Python 3.7+", "Jupyter Notebook", "Pandas", "NumPy", "Matplotlib", "StatsModels", "Prophet"],
-      datasets: ["股票价格数据: https://www.kaggle.com/datasets/szrlee/stock-time-series-2005-2020"]
+      tools: ["无前置要求，本项目会从零开始讲解"],
+      datasets: ["项目已内置模拟数据，无需额外下载"]
     },
     stepByStep: [
       {
-        title: "步骤1：环境搭建",
-        content: "安装时间序列分析库：",
-        code: "pip install pandas numpy matplotlib statsmodels prophet jupyter"
+        title: "步骤1：创建模拟数据",
+        content: "创建一个模拟的时间序列销售数据集：",
+        code: "import pandas as pd\nimport numpy as np\n\n# 创建模拟时间序列数据\nnp.random.seed(42)\n\n# 生成日期序列（1年的日数据）\ndates = pd.date_range(start='2023-07-01', end='2024-06-30', freq='D')\n\n# 创建有趋势和季节性的销售数据\nt = np.arange(len(dates))\n# 基础趋势\ntrend = 100 + 0.5 * t\n# 周季节性\nweekly_seasonality = 20 * np.sin(2 * np.pi * t / 7)\n# 月季节性\nmonthly_seasonality = 30 * np.sin(2 * np.pi * t / 30)\n# 随机噪声\nnoise = np.random.normal(0, 10, len(t))\n\n# 组合所有成分\nsales = trend + weekly_seasonality + monthly_seasonality + noise\nsales = np.maximum(sales, 50)  # 确保销售额不为负\n\n# 创建DataFrame\nsales_data = {\n    'date': dates,\n    'sales': sales.round(2)\n}\n\nsales_df = pd.DataFrame(sales_data)\nsales_df.set_index('date', inplace=True)\n\nprint('销售数据创建完成！')\nprint(f'数据形状: {sales_df.shape}')\nprint('\\n前5行数据:')\nprint(sales_df.head())\nprint('\\n数据统计:')\nprint(sales_df.describe())"
+      },
+      {
+        title: "步骤2：移动平均",
+        content: "使用移动平均进行平滑：",
+        code: "# 移动平均\nsales_df['MA7'] = sales_df['sales'].rolling(window=7).mean()\nsales_df['MA30'] = sales_df['sales'].rolling(window=30).mean()\n\nprint('移动平均计算完成！')\nprint('\\n数据预览（包含移动平均）:')\nprint(sales_df[['sales', 'MA7', 'MA30']].head(10))\nprint('\\n移动平均统计:')\nprint(sales_df[['MA7', 'MA30']].describe())"
+      },
+      {
+        title: "步骤3：指数平滑",
+        content: "使用简单指数平滑进行预测：",
+        code: "# 简单指数平滑\ndef simple_exponential_smoothing(series, alpha):\n    \"\"\"简单指数平滑\"\"\"\n    result = [series.iloc[0]]  # 初始值\n    for i in range(1, len(series)):\n        result.append(alpha * series.iloc[i] + (1 - alpha) * result[i-1])\n    return pd.Series(result, index=series.index)\n\n# 应用指数平滑\nsales_df['SES_01'] = simple_exponential_smoothing(sales_df['sales'], alpha=0.1)\nsales_df['SES_05'] = simple_exponential_smoothing(sales_df['sales'], alpha=0.5)\nsales_df['SES_09'] = simple_exponential_smoothing(sales_df['sales'], alpha=0.9)\n\nprint('指数平滑计算完成！')\nprint('\\n不同alpha值的效果对比:')\nprint('Alpha=0.1（平滑）:', sales_df['SES_01'].iloc[-5:].values.round(2))\nprint('Alpha=0.5（中等）:', sales_df['SES_05'].iloc[-5:].values.round(2))\nprint('Alpha=0.9（敏感）:', sales_df['SES_09'].iloc[-5:].values.round(2))"
+      },
+      {
+        title: "步骤4：简单预测",
+        content: "基于移动平均进行简单预测：",
+        code: "# 使用最后30天的平均值作为预测\nlast_30_avg = sales_df['sales'].tail(30).mean()\nlast_7_avg = sales_df['sales'].tail(7).mean()\nlast_value = sales_df['sales'].iloc[-1]\n\nprint('简单预测方法:')\nprint(f'最后1天销售额: {last_value:.2f}')\nprint(f'最后7天平均: {last_7_avg:.2f}')\nprint(f'最后30天平均: {last_30_avg:.2f}')\n\n# 预测未来7天\nprint('\\n未来7天预测（基于最后7天平均）:')\nfor i in range(1, 8):\n    print(f'第{i}天: {last_7_avg:.2f}')"
+      },
+      {
+        title: "步骤5：预测评估",
+        content: "评估不同预测方法的准确性：",
+        code: "# 使用历史数据进行回测\n# 将数据分为训练集和测试集\ntrain_size = int(len(sales_df) * 0.8)\ntrain = sales_df['sales'].iloc[:train_size]\ntest = sales_df['sales'].iloc[train_size:]\n\n# 简单预测：用训练集最后一个值预测所有测试集\nnaive_prediction = [train.iloc[-1]] * len(test)\n\n# 计算误差指标\ndef calculate_metrics(actual, predicted):\n    \"\"\"计算预测误差指标\"\"\"\n    errors = actual - predicted\n    mae = np.mean(np.abs(errors))\n    rmse = np.sqrt(np.mean(errors ** 2))\n    mape = np.mean(np.abs(errors / actual)) * 100\n    return mae, rmse, mape\n\nmae, rmse, mape = calculate_metrics(test.values, naive_prediction)\n\nprint('预测模型评估:')\nprint(f'测试集样本量: {len(test)}')\nprint(f'\\n误差指标:')\nprint(f'MAE (平均绝对误差): {mae:.2f}')\nprint(f'RMSE (均方根误差): {rmse:.2f}')\nprint(f'MAPE (平均绝对百分比误差): {mape:.2f}%')\n\nprint('\\n预测示例:')\nprint('实际值:', test.iloc[:5].values.round(2))\nprint('预测值:', np.array(naive_prediction[:5]).round(2))"
       }
     ],
     practiceTasks: [
-      "1. 获取真实的股票数据，使用Prophet进行股价预测",
-      "2. 分析时间序列中的节假日效应，并加入预测模型",
-      "3. 对比不同模型（ARIMA、Prophet、指数平滑）的预测性能"
+      "1. 尝试不同的移动平均窗口大小，比较效果",
+      "2. 使用指数平滑进行预测并调整alpha参数",
+      "3. 计算预测误差指标"
     ],
     practiceTaskAnswers: [
-      "# 练习1答案：使用Prophet预测股价\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom prophet import Prophet\nimport yfinance as yf\n\nprint('=== Prophet预测 ===')\nprint(f'MAE: {25.50:.2f}')\nprint(f'RMSE: {35.20:.2f}')\n"
+      "# 练习1答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndates = pd.date_range(start='2023-07-01', end='2024-06-30', freq='D')\nt = np.arange(len(dates))\ntrend = 100 + 0.5 * t\nweekly_seasonality = 20 * np.sin(2 * np.pi * t / 7)\nnoise = np.random.normal(0, 10, len(t))\nsales = trend + weekly_seasonality + noise\n\nsales_df = pd.DataFrame({'sales': sales.round(2)}, index=dates)\n\n# 不同窗口的移动平均\nwindows = [3, 7, 14, 30]\nfor window in windows:\n    sales_df[f'MA{window}'] = sales_df['sales'].rolling(window=window).mean()\n\nprint('不同窗口移动平均的最后值:')\nfor window in windows:\n    print(f'MA{window}: {sales_df[f\"MA{window}\"].iloc[-1]:.2f}')",
+      "# 练习2答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndates = pd.date_range(start='2023-07-01', end='2024-06-30', freq='D')\nt = np.arange(len(dates))\ntrend = 100 + 0.5 * t\nnoise = np.random.normal(0, 10, len(t))\nsales = trend + noise\n\nsales_df = pd.DataFrame({'sales': sales.round(2)}, index=dates)\n\ndef simple_exponential_smoothing(series, alpha):\n    result = [series.iloc[0]]\n    for i in range(1, len(series)):\n        result.append(alpha * series.iloc[i] + (1 - alpha) * result[i-1])\n    return pd.Series(result, index=series.index)\n\n# 测试不同alpha值\nalphas = [0.1, 0.3, 0.5, 0.7, 0.9]\nprint('不同alpha值的指数平滑预测:')\nfor alpha in alphas:\n    ses = simple_exponential_smoothing(sales_df['sales'], alpha)\n    print(f'Alpha={alpha}: {ses.iloc[-1]:.2f}')",
+      "# 练习3答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndates = pd.date_range(start='2023-07-01', end='2024-06-30', freq='D')\nt = np.arange(len(dates))\ntrend = 100 + 0.5 * t\nnoise = np.random.normal(0, 10, len(t))\nsales = trend + noise\n\nsales_df = pd.DataFrame({'sales': sales.round(2)}, index=dates)\n\n# 划分训练测试集\ntrain_size = int(len(sales_df) * 0.8)\ntrain = sales_df['sales'].iloc[:train_size]\ntest = sales_df['sales'].iloc[train_size:]\n\n# 简单预测\nnaive_prediction = [train.iloc[-1]] * len(test)\n\n# 计算误差\nerrors = test.values - naive_prediction\nmae = np.mean(np.abs(errors))\nrmse = np.sqrt(np.mean(errors ** 2))\nmape = np.mean(np.abs(errors / test.values)) * 100\n\nprint('预测误差指标:')\nprint(f'MAE: {mae:.2f}')\nprint(f'RMSE: {rmse:.2f}')\nprint(f'MAPE: {mape:.2f}%')"
     ],
     assessment: [
-      "1. 时间序列分解有哪些分量？它们的含义是什么？",
-      "2. Prophet相比传统时间序列方法有什么优势？"
+      "1. 时间序列的主要组成部分有哪些？",
+      "2. 简单移动平均和指数平滑的区别是什么？"
     ],
     assessmentAnswers: [
-      "时间序列分解通常包含三个分量：\n\n1. 趋势分量（Trend）：反映时间序列的长期变化趋势，例如持续增长或下降。\n2. 季节性分量（Seasonality）：反映时间序列的周期性变化，例如月度、季度或年度的规律。\n3. 残差分量（Residual）：去除趋势和季节性后剩余的随机波动部分。\n\n有些分解方法还会包含循环分量（Cycle），反映比季节性更长的周期性变化。",
-      "Prophet相比传统时间序列方法的优势：\n\n1. 处理缺失值和异常值的能力更强\n2. 能够自动处理季节性和节假日效应\n3. 支持添加自定义的节假日和特殊事件\n4. 提供直观的参数调整方法\n5. 生成的预测结果包含不确定性区间\n6. 对非平稳时间序列的处理效果更好\n7. 实现简单，API友好，易于使用\n8. 支持并行计算，处理大规模数据的能力强"
-    ]
+      "时间序列的主要组成部分：\\n1. 趋势(Trend)：长期增长或下降趋势\\n2. 季节性(Seasonality)：周期性波动\\n3. 周期性(Cyclical)：长期波动\\n4. 残差(Residual)：随机波动",
+      "简单移动平均和指数平滑的区别：\\n- 简单移动平均：所有历史数据权重相同\\n- 指数平滑：近期数据权重更大\\n- 指数平滑通常能更快适应变化"
+    ],
+    dataset: {
+      filename: "project7_features.csv",
+      name: "项目7 - 特征工程数据",
+      size: "1.1KB",
+      desc: "客户特征数据，包含年龄、性别、消费等级、活跃度等"
+    }
   },
   {
     id: 8,
-    title: "文本数据分析",
-    description: "分析社交媒体评论的情感倾向",
-    goal: "通过社交媒体评论数据，学习文本预处理、情感分析、词云可视化等文本数据分析技术",
-    dataSource: "社交媒体评论数据",
-    tools: ["Python", "NLTK", "spaCy", "TextBlob", "Pandas"],
+    title: "特征工程实战",
+    description: "学习特征构建技巧",
+    goal: "通过客户数据，学习特征构造、特征编码和特征变换",
+    dataSource: "客户特征数据集",
+    tools: ["Python", "Pandas", "NumPy", "Scikit-learn"],
     learningPoints: [
-      "文本预处理",
-      "分词和词干提取",
-      "情感分析",
-      "词频统计",
-      "词云可视化"
+      "特征构造",
+      "特征编码",
+      "特征变换",
+      "特征选择"
     ],
-    overview: "本项目将带你进入文本数据分析的世界。通过分析社交媒体评论数据，你将学习文本预处理、情感分析、词云可视化等技术，掌握NLTK和TextBlob等常用文本处理库的使用方法。",
+    overview: "本项目将带你学习特征工程的核心技巧。通过客户数据，你将掌握特征构造、编码、变换等技能，能够为机器学习模型构建高质量的特征集。",
+    duration: "60分钟",
     prerequisites: {
-      tools: ["Python 3.7+", "Jupyter Notebook", "Pandas", "NumPy", "NLTK", "TextBlob", "WordCloud", "Matplotlib"],
-      datasets: ["产品评论数据集: https://www.kaggle.com/datasets/snap/amazon-fine-food-reviews"]
+      tools: ["无前置要求，本项目会从零开始讲解"],
+      datasets: ["项目已内置模拟数据，无需额外下载"]
     },
     stepByStep: [
       {
-        title: "步骤1：环境搭建",
-        content: "安装文本分析相关库：",
-        code: "pip install pandas numpy nltk textblob wordcloud matplotlib jupyter"
+        title: "步骤1：创建模拟数据",
+        content: "创建一个模拟的客户特征数据集：",
+        code: "import pandas as pd\nimport numpy as np\n\n# 创建模拟客户数据\nnp.random.seed(42)\n\nn_customers = 500\n\ncustomer_data = {\n    'customer_id': np.arange(1001, 1001 + n_customers),\n    'age': np.random.randint(18, 70, n_customers),\n    'gender': np.random.choice(['男', '女', '未知'], n_customers, p=[0.48, 0.48, 0.04]),\n    'region': np.random.choice(['华北', '华东', '华南', '西南', '西北'], n_customers),\n    'total_spent': np.random.uniform(100, 10000, n_customers).round(2),\n    'purchase_count': np.random.randint(1, 50, n_customers),\n    'last_purchase_days': np.random.randint(1, 365, n_customers),\n    'is_active': np.random.choice([0, 1], n_customers, p=[0.3, 0.7])\n}\n\ncustomer_df = pd.DataFrame(customer_data)\n\nprint('客户数据创建完成！')\nprint(f'数据形状: {customer_df.shape}')\nprint('\\n前5行数据:')\nprint(customer_df.head())\nprint('\\n数据信息:')\ncustomer_df.info()"
+      },
+      {
+        title: "步骤2：特征构造",
+        content: "从现有特征构造新特征：",
+        code: "# 特征构造\n# 1. 平均订单金额\ncustomer_df['avg_order_value'] = customer_df['total_spent'] / customer_df['purchase_count']\n\n# 2. 消费等级（分箱）\ncustomer_df['spending_level'] = pd.qcut(customer_df['total_spent'], 4, labels=['低', '中', '高', 'VIP'])\n\n# 3. 活跃度评分\ncustomer_df['activity_score'] = (\n    (customer_df['is_active'] * 50) +\n    (np.maximum(0, 365 - customer_df['last_purchase_days']) / 365 * 30) +\n    (np.minimum(customer_df['purchase_count'], 20) / 20 * 20)\n)\n\n# 4. 年龄分组\ncustomer_df['age_group'] = pd.cut(customer_df['age'], \n                                 bins=[0, 25, 35, 45, 55, 100],\n                                 labels=['18-25', '26-35', '36-45', '46-55', '55+'])\n\nprint('特征构造完成！')\nprint('\\n新特征统计:')\nprint('平均订单金额统计:')\nprint(customer_df['avg_order_value'].describe().round(2))\nprint('\\n消费等级分布:')\nprint(customer_df['spending_level'].value_counts())\nprint('\\n年龄分组分布:')\nprint(customer_df['age_group'].value_counts().sort_index())"
+      },
+      {
+        title: "步骤3：特征编码",
+        content: "处理分类变量：",
+        code: "# 特征编码示例\nprint('原始分类特征:')\nprint('性别:', customer_df['gender'].unique())\nprint('地区:', customer_df['region'].unique())\nprint('消费等级:', customer_df['spending_level'].unique())\n\n# 1. 标签编码（适用于有序变量）\nspending_mapping = {'低': 0, '中': 1, '高': 2, 'VIP': 3}\ncustomer_df['spending_level_encoded'] = customer_df['spending_level'].map(spending_mapping)\n\n# 2. 独热编码（适用于无序变量）\n# 简单实现：手动创建one-hot列\nfor region in customer_df['region'].unique():\n    customer_df[f'region_{region}'] = (customer_df['region'] == region).astype(int)\n\nprint('\\n特征编码完成！')\nprint('\\n消费等级编码示例:')\nprint(customer_df[['spending_level', 'spending_level_encoded']].head())\nprint('\\n地区独热编码示例:')\nregion_cols = [col for col in customer_df.columns if col.startswith('region_')]\nprint(customer_df[['region'] + region_cols].head())"
+      },
+      {
+        title: "步骤4：特征变换",
+        content: "数值特征标准化和归一化：",
+        code: "# 特征变换\nnumeric_features = ['age', 'total_spent', 'purchase_count', 'avg_order_value', 'activity_score']\n\nprint('原始数值特征统计:')\nprint(customer_df[numeric_features].describe().round(2))\n\n# 1. 标准化 (Z-score normalization)\nprint('\\n标准化特征:')\nfor feature in numeric_features:\n    mean_val = customer_df[feature].mean()\n    std_val = customer_df[feature].std()\n    customer_df[f'{feature}_standardized'] = (customer_df[feature] - mean_val) / std_val\n    print(f'{feature}: 均值={mean_val:.2f}, 标准差={std_val:.2f}')\n\n# 2. 归一化 (Min-Max scaling)\nprint('\\n归一化特征:')\nfor feature in numeric_features:\n    min_val = customer_df[feature].min()\n    max_val = customer_df[feature].max()\n    customer_df[f'{feature}_normalized'] = (customer_df[feature] - min_val) / (max_val - min_val)\n    print(f'{feature}: 最小值={min_val:.2f}, 最大值={max_val:.2f}')\n\nprint('\\n特征变换完成！')\nprint('\\n变换后的特征示例（前3行）:')\npreview_cols = ['age', 'age_standardized', 'age_normalized', \n                'total_spent', 'total_spent_standardized', 'total_spent_normalized']\nprint(customer_df[preview_cols].head(3).round(4))"
+      },
+      {
+        title: "步骤5：特征选择",
+        content: "基于相关性选择重要特征：",
+        code: "# 特征选择：相关性分析\n# 选择数值特征进行相关性分析\ncorrelation_features = ['age', 'total_spent', 'purchase_count', \n                        'avg_order_value', 'activity_score', 'last_purchase_days']\n\n# 计算相关系数矩阵\ncorrelation_matrix = customer_df[correlation_features].corr()\n\nprint('特征相关系数矩阵:')\nprint(correlation_matrix.round(3))\n\n# 找出与目标变量（假设为活跃度）高度相关的特征\ntarget = 'activity_score'\nprint(f'\\n与{target}的相关性:')\ncorrelations = correlation_matrix[target].abs().sort_values(ascending=False)\nfor feature, corr in correlations.items():\n    if feature != target:\n        print(f'{feature}: {corr:.3f}')\n\n# 特征重要性排序\nprint('\\n特征重要性排序（基于相关性）:')\nfor i, (feature, corr) in enumerate(correlations.items(), 1):\n    if feature != target:\n        print(f'{i}. {feature}: {corr:.3f}')"
       }
     ],
     practiceTasks: [
-      "1. 使用真实的电商评论数据进行情感分析",
-      "2. 尝试使用更专业的中文NLP库如snownlp或jieba",
-      "3. 分析不同产品类别的评论特点和情感倾向"
+      "1. 从日期特征中提取多种时间特征",
+      "2. 尝试不同的特征编码方式并比较",
+      "3. 使用相关性分析进行特征选择"
     ],
     practiceTaskAnswers: [
-      "# 练习1答案：使用真实电商评论数据\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport re\nfrom collections import Counter\n\nplt.rcParams['font.sans-serif'] = ['SimHei']\nplt.rcParams['axes.unicode_minus'] = False\n\nprint('=== 情感分析准确率: 85.20% ===')\nprint('\n各产品情感分布:')\nprint('产品      正面    负面')\nprint('手机      350     150')\nprint('电脑      320     180')\nprint('耳机      380     120')\nprint('手表      340     160')\nprint('平板      360     140')\n"
+      "# 练习1答案\nimport pandas as pd\nimport numpy as np\n\n# 创建包含日期的数据\ndates = pd.date_range(start='2024-01-01', end='2024-06-30', periods=100)\ndf = pd.DataFrame({'date': dates})\n\n# 提取时间特征\ndf['year'] = df['date'].dt.year\ndf['month'] = df['date'].dt.month\ndf['day'] = df['date'].dt.day\ndf['day_of_week'] = df['date'].dt.day_of_week  # 0=周一, 6=周日\ndf['day_of_year'] = df['date'].dt.day_of_year\ndf['quarter'] = df['date'].dt.quarter\ndf['is_weekend'] = (df['day_of_week'] >= 5).astype(int)\ndf['is_month_start'] = df['date'].dt.is_month_start.astype(int)\ndf['is_month_end'] = df['date'].dt.is_month_end.astype(int)\n\nprint('时间特征提取完成:')\nprint(df.head())",
+      "# 练习2答案\nprint('不同特征编码方式:')\nprint('1. 标签编码：适用于有序分类变量（如：低/中/高）')\nprint('2. 独热编码：适用于无序分类变量（如：地区）')\nprint('3. 频率编码：用类别出现的频率编码')\nprint('4. 目标编码：用目标变量的均值编码（需要小心数据泄露）')",
+      "# 练习3答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\ndata = {\n    'feature1': np.random.randn(100),\n    'feature2': np.random.randn(100),\n    'feature3': np.random.randn(100),\n    'feature4': np.random.randn(100),\n    'target': np.random.randn(100)\n}\ndf = pd.DataFrame(data)\n\n# 添加一些相关性\ndf['target'] = df['feature1'] * 0.8 + df['feature2'] * 0.5 + np.random.randn(100) * 0.3\n\n# 计算相关性\ncorrelations = df.corr()['target'].abs().sort_values(ascending=False)\nprint('特征与目标的相关性:')\nprint(correlations)"
     ],
     assessment: [
-      "1. 文本预处理通常包括哪些步骤？",
-      "2. 情感分析有哪些应用场景？请举例说明"
+      "1. 为什么需要进行特征工程？",
+      "2. 特征选择的主要方法有哪些？"
     ],
     assessmentAnswers: [
-      "文本预处理通常包括以下步骤：\n\n1. 去除特殊字符和标点符号\n2. 转换为小写（英文）\n3. 分词（中文需要专门的分词工具）\n4. 去除停用词\n5. 词干提取或词形还原（英文）\n6. 去除数字（如果不需要）\n7. 去除空白字符\n8. 文本规范化（如拼写纠正）\n9. 特征提取（如TF-IDF、词嵌入）\n10. 数据清洗（去除重复文本、处理缺失值）",
-      "情感分析的应用场景：\n\n1. 社交媒体监测：分析用户对品牌、产品的情感倾向\n2. 客户服务：自动分类客户反馈，识别负面情绪\n3. 市场调研：了解消费者对产品的态度\n4. 金融分析：分析新闻、社交媒体对股票的影响\n5. 产品改进：根据用户评论发现产品问题\n6. 舆情监控：监测社会热点事件的公众情绪\n7. 电影/书籍评论分析：自动评分和推荐\n8. 政治分析：分析选民对政策的态度"
-    ]
+      "特征工程的重要性：\\n1. 提高模型性能\\n2. 使模型更容易解释\\n3. 减少计算量\\n4. 避免过拟合\\n5. 发现数据中的模式",
+      "特征选择的主要方法：\\n1. 过滤法(Filter)：基于统计指标\\n2. 包装法(Wrapper)：基于模型性能\\n3. 嵌入法(Embedded)：模型训练过程中自动选择"
+    ],
+    dataset: {
+      filename: "project8_outliers.csv",
+      name: "项目8 - 异常检测数据",
+      size: "0.7KB",
+      desc: "交易数据，包含异常值用于异常检测练习"
+    }
   },
   {
     id: 9,
-    title: "数据仪表盘构建",
-    description: "使用Power BI或Tableau创建交互式仪表盘",
-    goal: "通过多维度业务数据，学习使用商业智能工具创建美观、交互式的数据仪表盘",
-    dataSource: "多维度业务数据",
-    tools: ["Power BI", "Tableau", "Python", "Pandas"],
+    title: "异常值检测系统",
+    description: "学习异常检测方法",
+    goal: "通过客户数据，学习统计方法、孤立森林等异常检测技术",
+    dataSource: "客户交易数据集",
+    tools: ["Python", "Pandas", "NumPy", "Scikit-learn"],
     learningPoints: [
-      "数据建模",
-      "可视化设计",
-      "交互式筛选",
-      "KPI展示",
-      "仪表盘发布"
+      "统计方法检测",
+      "孤立森林",
+      "Z-score方法",
+      "IQR方法",
+      "异常值可视化"
     ],
-    overview: "本项目将带你学习如何构建专业的数据仪表盘。我们将使用Python准备数据，然后指导你使用Power BI或Tableau创建交互式的业务仪表盘，包括KPI卡片、趋势图表、地图可视化等。",
+    overview: "本项目将带你学习异常检测技术。通过客户交易数据，你将掌握统计方法、孤立森林等异常检测算法，能够构建实用的异常检测系统。",
+    duration: "60分钟",
     prerequisites: {
-      tools: ["Python 3.7+", "Jupyter Notebook", "Pandas", "NumPy", "Power BI Desktop 或 Tableau Public"],
-      datasets: ["示例销售数据: https://www.kaggle.com/datasets/kyanyoga/sample-sales-data"]
+      tools: ["无前置要求，本项目会从零开始讲解"],
+      datasets: ["项目已内置模拟数据，无需额外下载"]
     },
     stepByStep: [
       {
-        title: "步骤1：数据准备",
-        content: "使用Python生成和准备仪表盘数据：",
-        code: "import pandas as pd\nimport numpy as np\nfrom datetime import datetime, timedelta\n\nprint('=== 销售数据概览 ===')\nprint('数据形状: (4870, 12)')\n"
+        title: "步骤1：创建模拟数据",
+        content: "创建一个包含异常值的模拟数据集：",
+        code: "import pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\n\nn_samples = 1000\n\n# 正常数据\nnormal_data = {\n    'transaction_amount': np.random.normal(500, 100, n_samples),\n    'transaction_count': np.random.poisson(10, n_samples),\n    'account_age_days': np.random.randint(30, 1000, n_samples)\n}\n\ndf = pd.DataFrame(normal_data)\n\n# 添加异常值\nn_outliers = 50\noutlier_indices = np.random.choice(n_samples, n_outliers, replace=False)\n\n# 大额交易异常\ndf.loc[outlier_indices[:25], 'transaction_amount'] = np.random.uniform(5000, 10000, 25)\n\n# 频繁交易异常\ndf.loc[outlier_indices[25:40], 'transaction_count'] = np.random.randint(100, 200, 15)\n\n# 新账户大额交易异常\nnew_account_indices = outlier_indices[40:]\ndf.loc[new_account_indices, 'account_age_days'] = np.random.randint(1, 7, len(new_account_indices))\ndf.loc[new_account_indices, 'transaction_amount'] = np.random.uniform(3000, 8000, len(new_account_indices))\n\n# 确保数值为正\ndf['transaction_amount'] = df['transaction_amount'].abs()\n\nprint('数据创建完成！')\nprint(f'数据形状: {df.shape}')\nprint('\\n数据统计:')\nprint(df.describe().round(2))\nprint('\\n前5行数据:')\nprint(df.head())"
+      },
+      {
+        title: "步骤2：Z-score方法",
+        content: "使用Z-score检测单变量异常值：",
+        code: "# Z-score方法\nprint('Z-score异常检测:')\n\nfor feature in ['transaction_amount', 'transaction_count', 'account_age_days']:\n    # 计算Z-score\n    mean_val = df[feature].mean()\n    std_val = df[feature].std()\n    z_scores = (df[feature] - mean_val) / std_val\n    \n    # 标记异常值（|Z| > 3）\n    outliers = (z_scores.abs() > 3)\n    outlier_count = outliers.sum()\n    \n    df[f'{feature}_zscore_outlier'] = outliers.astype(int)\n    \n    print(f'{feature}:')\n    print(f'  均值: {mean_val:.2f}, 标准差: {std_val:.2f}')\n    print(f'  检测到 {outlier_count} 个异常值 ({outlier_count/len(df)*100:.1f}%)')\n    if outlier_count > 0:\n        print(f'  异常值示例: {df[feature][outliers].head().values.round(2)}')\n\n# 综合Z-score异常\ndf['any_zscore_outlier'] = (\n    df['transaction_amount_zscore_outlier'] | \n    df['transaction_count_zscore_outlier'] | \n    df['account_age_days_zscore_outlier']\n).astype(int)\n\nprint(f'\\nZ-score检测到的总异常数: {df[\"any_zscore_outlier\"].sum()}')"
+      },
+      {
+        title: "步骤3：IQR方法",
+        content: "使用IQR方法检测异常值：",
+        code: "# IQR方法\nprint('IQR异常检测:')\n\nfor feature in ['transaction_amount', 'transaction_count', 'account_age_days']:\n    # 计算IQR\n    Q1 = df[feature].quantile(0.25)\n    Q3 = df[feature].quantile(0.75)\n    IQR = Q3 - Q1\n    lower_bound = Q1 - 1.5 * IQR\n    upper_bound = Q3 + 1.5 * IQR\n    \n    # 标记异常值\n    outliers = (df[feature] < lower_bound) | (df[feature] > upper_bound)\n    outlier_count = outliers.sum()\n    \n    df[f'{feature}_iqr_outlier'] = outliers.astype(int)\n    \n    print(f'{feature}:')\n    print(f'  Q1: {Q1:.2f}, Q3: {Q3:.2f}, IQR: {IQR:.2f}')\n    print(f'  范围: [{lower_bound:.2f}, {upper_bound:.2f}]')\n    print(f'  检测到 {outlier_count} 个异常值 ({outlier_count/len(df)*100:.1f}%)')\n    if outlier_count > 0:\n        print(f'  异常值示例: {df[feature][outliers].head().values.round(2)}')\n\n# 综合IQR异常\ndf['any_iqr_outlier'] = (\n    df['transaction_amount_iqr_outlier'] | \n    df['transaction_count_iqr_outlier'] | \n    df['account_age_days_iqr_outlier']\n).astype(int)\n\nprint(f'\\nIQR检测到的总异常数: {df[\"any_iqr_outlier\"].sum()}')"
+      },
+      {
+        title: "步骤4：孤立森林",
+        content: "使用孤立森林进行多变量异常检测：",
+        code: "from sklearn.ensemble import IsolationForest\n\n# 孤立森林\nprint('孤立森林异常检测:')\n\n# 选择特征\nfeatures = ['transaction_amount', 'transaction_count', 'account_age_days']\nX = df[features].values\n\n# 训练孤立森林\niso_forest = IsolationForest(contamination=0.05, random_state=42)\nprint('训练孤立森林...')\nprint(f'参数: contamination=0.05 (预计5%异常)')\n\n# 预测异常值\nanomaly_scores = iso_forest.fit_predict(X)\n# 1为正常，-1为异常\ndf['isolation_forest_outlier'] = (anomaly_scores == -1).astype(int)\n\n# 获取异常分数\noutlier_scores = iso_forest.decision_function(X)\ndf['anomaly_score'] = -outlier_scores  # 分数越高越异常\n\noutlier_count = df['isolation_forest_outlier'].sum()\nprint(f'\\n孤立森林检测到 {outlier_count} 个异常值 ({outlier_count/len(df)*100:.1f}%)')\n\n# 显示最异常的样本\nprint('\\nTop 10 最异常样本:')\ntop_outliers = df.nlargest(10, 'anomaly_score')\nprint(top_outliers[features + ['anomaly_score']].round(2))"
+      },
+      {
+        title: "步骤5：综合分析",
+        content: "综合多种方法的检测结果：",
+        code: "# 综合分析\nprint('=' * 60)\nprint('异常检测综合报告')\nprint('=' * 60)\n\nprint(f'\\n1. 数据概况:')\nprint(f'  总样本数: {len(df)}')\n\nprint(f'\\n2. 各方法检测结果:')\nprint(f'  Z-score方法: {df[\"any_zscore_outlier\"].sum()} 个异常')\nprint(f'  IQR方法: {df[\"any_iqr_outlier\"].sum()} 个异常')\nprint(f'  孤立森林: {df[\"isolation_forest_outlier\"].sum()} 个异常')\n\n# 计算一致性\nprint(f'\\n3. 方法一致性:')\ndf['outlier_vote'] = (\n    df['any_zscore_outlier'] + \n    df['any_iqr_outlier'] + \n    df['isolation_forest_outlier']\n)\n\nvote_counts = df['outlier_vote'].value_counts().sort_index()\nfor votes, count in vote_counts.items():\n    print(f'  {votes} 种方法标记为异常: {count} 个样本')\n\n# 高置信度异常（至少2种方法同意）\nhigh_confidence_outliers = df[df['outlier_vote'] >= 2]\nprint(f'\\n4. 高置信度异常:')\nprint(f'  至少2种方法同意的异常: {len(high_confidence_outliers)} 个')\n\nif len(high_confidence_outliers) > 0:\n    print(f'  示例:')\n    print(high_confidence_outliers[['transaction_amount', 'transaction_count', 'account_age_days', 'outlier_vote']].head().round(2))\n\nprint('\\n' + '=' * 60)\nprint('报告结束')\nprint('=' * 60)"
       }
     ],
     practiceTasks: [
-      "1. 使用Power BI或Tableau根据提供的数据创建完整的仪表盘",
-      "2. 添加更多KPI指标和可视化图表",
-      "3. 为仪表盘添加钻取功能，实现从概览到明细的数据探索"
+      "1. 可视化不同方法检测到的异常值",
+      "2. 尝试调整孤立森林的contamination参数",
+      "3. 比较几种方法的检测结果差异"
     ],
     practiceTaskAnswers: [
-      "# 练习1答案：Power BI仪表盘构建指南\n\n## Power BI仪表盘构建步骤\n\n### 1. 数据导入\n- 打开Power BI Desktop\n- 点击\"获取数据\" -> \"Excel\"\n- 选择生成的\"仪表盘销售数据.xlsx\"\n- 加载数据\n\n### 2. 数据建模\n- 在建模视图中，确保数据类型正确\n- 日期格式设置为\"日期\"\n- 数值格式设置为\"货币\"或\"整数\"\n\n### 3. 创建KPI卡片\n- 总销售额: 拖动\"销售额\"字段到画布，选择\"卡片\"可视化\n- 总订单数: 创建新度量值 DISTINCTCOUNT(表[订单编号])\n- 平均客单价: 创建新度量值 AVERAGE(表[销售额])\n- 同比增长率: 计算与去年同期的对比\n\n### 4. 创建趋势图表\n- 月度销售趋势: 折线图，X轴=日期，Y轴=销售额\n- 按类别销售: 柱状图，X轴=产品类别，Y轴=销售额\n- 按地区销售: 地图可视化，位置=销售地区，大小=销售额\n\n### 5. 添加交互式筛选器\n- 年份筛选器: 将\"年份\"字段拖到筛选器面板\n- 地区筛选器: 将\"销售地区\"字段拖到筛选器面板\n- 产品筛选器: 将\"产品名称\"字段拖到筛选器面板\n\n### 6. 仪表盘美化\n- 统一配色方案\n- 添加标题和说明文字\n- 调整图表布局和大小\n- 添加公司Logo（可选）\n\n### 7. 发布和分享\n- 点击\"发布\"按钮\n- 保存到Power BI服务\n- 生成分享链接或嵌入代码\n"
+      "# 练习1答案\nimport pandas as pd\nimport numpy as np\n\n# 创建模拟数据\nnp.random.seed(42)\nn_samples = 1000\ndata = {\n    'transaction_amount': np.random.normal(500, 100, n_samples),\n    'transaction_count': np.random.poisson(10, n_samples)\n}\ndf = pd.DataFrame(data)\n\n# 添加异常值\noutlier_indices = np.random.choice(n_samples, 50, replace=False)\ndf.loc[outlier_indices, 'transaction_amount'] = np.random.uniform(5000, 10000, 50)\n\n# Z-score检测\nz_scores = (df['transaction_amount'] - df['transaction_amount'].mean()) / df['transaction_amount'].std()\ndf['zscore_outlier'] = (z_scores.abs() > 3).astype(int)\n\nprint('异常检测结果:')\nprint(f'正常样本: {len(df[df[\"zscore_outlier\"] == 0])}')\nprint(f'异常样本: {len(df[df[\"zscore_outlier\"] == 1])}')\nprint('\\n异常样本示例:')\nprint(df[df['zscore_outlier'] == 1].head())",
+      "# 练习2答案\nprint('孤立森林contamination参数的作用:')\nprint('- contamination=0.01: 只检测1%最异常的样本（严格）')\nprint('- contamination=0.05: 检测5%异常样本（常用）')\nprint('- contamination=0.10: 检测10%异常样本（宽松）')\nprint('\\n建议:')\nprint('1. 根据业务知识预估异常比例')\nprint('2. 尝试不同值并验证结果')\nprint('3. 结合其他方法交叉验证')",
+      "# 练习3答案\nprint('不同异常检测方法的特点:')\nprint('\\n1. Z-score方法:')\nprint('   - 优点: 简单快速，单变量检测')\nprint('   - 缺点: 假设正态分布，对多变量不敏感')\n\nprint('\\n2. IQR方法:')\nprint('   - 优点: 不假设分布，鲁棒性好')\nprint('   - 缺点: 只能单变量，不太敏感')\n\nprint('\\n3. 孤立森林:')\nprint('   - 优点: 多变量检测，适合高维数据')\nprint('   - 缺点: 需要调参，计算量较大')\n\nprint('\\n建议: 结合多种方法使用！')"
     ],
     assessment: [
-      "1. 一个好的数据仪表盘应该具备哪些特点？",
-      "2. KPI卡片设计时应该注意什么？"
+      "1. 异常检测在实际业务中有什么应用？",
+      "2. 简述孤立森林的工作原理"
     ],
     assessmentAnswers: [
-      "一个好的数据仪表盘应该具备以下特点：\n\n1. 简洁明了：避免信息过载，只展示关键指标\n2. 视觉清晰：使用合适的图表类型，颜色搭配协调\n3. 交互友好：支持筛选、钻取等交互功能\n4. 实时更新：能够反映最新的数据状态\n5. 目标导向：聚焦于业务目标和关键问题\n6. 响应式设计：适配不同屏幕尺寸\n7. 可扩展性：方便添加新的指标和功能\n8. 易理解性：有清晰的标题和说明文字",
-      "KPI卡片设计时应该注意：\n\n1. 选择关键指标：只展示最重要的3-5个指标\n2. 明确展示数值：大字体显示当前值\n3. 添加趋势信息：显示变化趋势（上升/下降箭头）\n4. 对比目标：展示与目标的对比\n5. 使用颜色编码：绿色表示好，红色表示差\n6. 保持简洁：避免过多信息\n7. 统一布局：所有KPI卡片保持一致的设计风格\n8. 添加时间维度：显示是哪个时间段的数据"
-    ]
+      "异常检测的应用：\\n1. 欺诈检测：识别异常交易\\n2. 网络安全：检测入侵行为\\n3. 质量控制：发现次品\\n4. 医疗：发现罕见病例\\n5. 运维：检测系统异常",
+      "孤立森林工作原理：\\n1. 随机选择特征和分割点\\n2. 递归分割数据\\n3. 异常值需要更少的分割就能被孤立\\n4. 通过路径长度判断异常程度"
+    ],
+    dataset: {
+      filename: "project9_multi_source.csv",
+      name: "项目9 - 多源数据",
+      size: "1.5KB",
+      desc: "多源数据融合示例，包含订单、客户、产品信息"
+    }
   },
   {
     id: 10,
-    title: "综合实战项目",
-    description: "端到端的数据分析项目实战",
-    goal: "整合前面所学的所有知识，完成一个完整的、端到端的数据分析项目，从问题定义到报告撰写",
-    dataSource: "自选行业数据",
-    tools: ["Python", "Pandas", "Scikit-learn", "Matplotlib", "Power BI"],
+    title: "多源数据融合",
+    description: "学习数据整合技巧",
+    goal: "通过多个数据源的融合，学习数据合并、连接、去重和数据一致性处理",
+    dataSource: "多源电商数据集",
+    tools: ["Python", "Pandas", "NumPy"],
     learningPoints: [
-      "问题定义",
-      "数据收集",
-      "数据清洗",
-      "探索性分析",
-      "建模预测",
-      "结果展示",
-      "报告撰写"
+      "数据合并",
+      "表连接操作",
+      "数据去重",
+      "数据一致性",
+      "数据仓库概念"
     ],
-    overview: "本项目是一个综合性实战项目，要求你整合前面所学的所有知识，完成一个完整的数据分析项目。你可以选择自己感兴趣的行业和主题，经历从问题定义到最终报告的完整流程。",
+    overview: "本项目将带你学习多源数据融合技术。通过整合多个电商数据源，你将掌握数据合并、连接、去重和一致性处理，能够构建完整的整合数据集。",
+    duration: "60分钟",
     prerequisites: {
-      tools: ["Python 3.7+", "Jupyter Notebook", "Pandas", "NumPy", "Matplotlib", "Seaborn", "Scikit-learn", "Power BI/Tableau"],
-      datasets: ["Kaggle数据集: https://www.kaggle.com/datasets"]
+      tools: ["无前置要求，本项目会从零开始讲解"],
+      datasets: ["项目已内置模拟数据，无需额外下载"]
     },
     stepByStep: [
       {
-        title: "步骤1：项目选题与问题定义",
-        content: "选择感兴趣的主题并明确分析目标：",
-        code: "print('=== 综合实战项目指南 ===')\nprint('\\n项目建议主题:')\nprint('1. 电商数据分析 - 用户行为、销售预测、库存优化')\nprint('2. 金融数据分析 - 信用评分、欺诈检测、投资分析')\nprint('3. 医疗数据分析 - 疾病预测、医院运营优化')\nprint('4. 教育数据分析 - 学生成绩预测、课程推荐')\nprint('5. 交通数据分析 - 拥堵预测、路径优化')\nprint('6. 社交媒体分析 - 舆情监测、用户画像')\nprint('7. 房地产分析 - 房价预测、投资建议')\nprint('8. 体育数据分析 - 比赛预测、球员评估')\n"
+        title: "步骤1：创建模拟数据",
+        content: "创建多个模拟数据源：",
+        code: "import pandas as pd\nimport numpy as np\n\nnp.random.seed(42)\n\n# 1. 订单数据\nn_orders = 200\norders_data = {\n    'order_id': np.arange(1001, 1001 + n_orders),\n    'customer_id': np.random.randint(2001, 2050, n_orders),\n    'product_id': np.random.randint(3001, 3020, n_orders),\n    'quantity': np.random.randint(1, 5, n_orders),\n    'unit_price': np.random.uniform(10, 500, n_orders).round(2),\n    'order_date': pd.date_range(start='2024-01-01', periods=n_orders, freq='D'),\n    'status': np.random.choice(['完成', '待发货', '已取消'], n_orders, p=[0.7, 0.2, 0.1])\n}\norders_df = pd.DataFrame(orders_data)\norders_df['total_amount'] = orders_df['quantity'] * orders_df['unit_price']\n\n# 2. 客户数据\ncustomers_data = {\n    'customer_id': np.arange(2001, 2050),\n    'customer_name': [f'客户{i}' for i in range(2001, 2050)],\n    'email': [f'customer{i}@example.com' for i in range(2001, 2050)],\n    'phone': [f'138{str(np.random.randint(10000000, 99999999))}' for _ in range(49)],\n    'register_date': pd.date_range(start='2023-01-01', periods=49, freq='W'),\n    'level': np.random.choice(['普通', '银卡', '金卡', '钻石'], 49, p=[0.5, 0.3, 0.15, 0.05]),\n    'region': np.random.choice(['华北', '华东', '华南', '西南', '西北'], 49)\n}\ncustomers_df = pd.DataFrame(customers_data)\n\n# 3. 产品数据\nproducts_data = {\n    'product_id': np.arange(3001, 3020),\n    'product_name': [f'产品{i}' for i in range(3001, 3020)],\n    'category': np.random.choice(['电子产品', '服装', '食品', '家居', '图书'], 19),\n    'brand': np.random.choice(['品牌A', '品牌B', '品牌C', '品牌D'], 19),\n    'cost_price': np.random.uniform(5, 300, 19).round(2),\n    'stock': np.random.randint(10, 500, 19),\n    'is_active': np.random.choice([True, False], 19, p=[0.9, 0.1])\n}\nproducts_df = pd.DataFrame(products_data)\n\nprint('多源数据创建完成！')\nprint(f'\\n订单数据: {orders_df.shape}')\nprint(f'客户数据: {customers_df.shape}')\nprint(f'产品数据: {products_df.shape}')\nprint('\\n订单数据前3行:')\nprint(orders_df.head(3))\nprint('\\n客户数据前3行:')\nprint(customers_df.head(3))\nprint('\\n产品数据前3行:')\nprint(products_df.head(3))"
+      },
+      {
+        title: "步骤2：数据合并",
+        content: "使用merge进行表连接：",
+        code: "# 1. 订单 + 客户\nprint('1. 订单数据与客户数据合并:')\norders_customers = pd.merge(\n    orders_df,\n    customers_df,\n    on='customer_id',\n    how='left'  # 保留所有订单\n)\nprint(f'  合并后形状: {orders_customers.shape}')\nprint(f'  合并后列: {orders_customers.columns.tolist()}')\n\n# 2. 再合并产品数据\nprint('\\n2. 再与产品数据合并:')\nfull_data = pd.merge(\n    orders_customers,\n    products_df,\n    on='product_id',\n    how='left'\n)\nprint(f'  合并后形状: {full_data.shape}')\nprint(f'  最终列数: {len(full_data.columns)}')\n\nprint('\\n3. 完整数据预览:')\npreview_cols = ['order_id', 'customer_name', 'product_name', \n                'category', 'quantity', 'total_amount', 'status']\nprint(full_data[preview_cols].head(5))"
+      },
+      {
+        title: "步骤3：连接类型",
+        content: "学习不同的连接方式：",
+        code: "# 演示不同的连接类型\nprint('连接类型对比:')\n\n# 创建示例数据\nleft = pd.DataFrame({\n    'id': [1, 2, 3, 4],\n    'value_left': ['A', 'B', 'C', 'D']\n})\n\nright = pd.DataFrame({\n    'id': [3, 4, 5, 6],\n    'value_right': ['X', 'Y', 'Z', 'W']\n})\n\nprint('\\n左表:')\nprint(left)\nprint('\\n右表:')\nprint(right)\n\nprint('\\n1. INNER JOIN (内连接): 只保留匹配的记录')\ninner = pd.merge(left, right, on='id', how='inner')\nprint(inner)\n\nprint('\\n2. LEFT JOIN (左连接): 保留左表所有记录')\nleft_join = pd.merge(left, right, on='id', how='left')\nprint(left_join)\n\nprint('\\n3. RIGHT JOIN (右连接): 保留右表所有记录')\nright_join = pd.merge(left, right, on='id', how='right')\nprint(right_join)\n\nprint('\\n4. OUTER JOIN (全连接): 保留所有记录')\nouter = pd.merge(left, right, on='id', how='outer')\nprint(outer)"
+      },
+      {
+        title: "步骤4：数据去重",
+        content: "处理重复数据：",
+        code: "# 模拟重复数据\nprint('数据去重演示:')\n\n# 创建有重复的数据\ndata_with_duplicates = pd.concat([orders_df.head(10), orders_df.head(3)])\nprint(f'\\n原始数据（含重复）: {len(data_with_duplicates)} 行')\nprint(f'重复的order_id: {data_with_duplicates[\"order_id\"].duplicated().sum()} 个')\n\n# 1. 完全去重\ndeduped_all = data_with_duplicates.drop_duplicates()\nprint(f'完全去重后: {len(deduped_all)} 行')\n\n# 2. 按指定列去重\ndeduped_key = data_with_duplicates.drop_duplicates(subset=['order_id'], keep='first')\nprint(f'按order_id去重后: {len(deduped_key)} 行')\n\n# 在完整数据上检查重复\nprint(f'\\n完整数据去重检查:')\nprint(f'完整数据行数: {len(full_data)}')\nprint(f'重复订单数: {full_data[\"order_id\"].duplicated().sum()}')\n\n# 去除重复订单（如果有）\nif full_data['order_id'].duplicated().sum() > 0:\n    full_data_deduped = full_data.drop_duplicates(subset=['order_id'], keep='first')\n    print(f'去重后行数: {len(full_data_deduped)}')\nelse:\n    print('没有发现重复订单')"
+      },
+      {
+        title: "步骤5：分析应用",
+        content: "使用融合后的数据进行分析：",
+        code: "# 使用融合后的数据进行分析\nprint('=' * 60)\nprint('数据融合分析报告')\nprint('=' * 60)\n\n# 1. 按客户等级统计\nprint('\\n1. 客户等级销售统计:')\nlevel_stats = full_data.groupby('level').agg({\n    'order_id': 'count',\n    'total_amount': ['sum', 'mean']\n}).round(2)\nlevel_stats.columns = ['订单数', '总销售额', '平均订单金额']\nprint(level_stats)\n\n# 2. 按产品类别统计\nprint('\\n2. 产品类别销售统计:')\ncategory_stats = full_data.groupby('category').agg({\n    'order_id': 'count',\n    'quantity': 'sum',\n    'total_amount': 'sum'\n}).round(2)\ncategory_stats.columns = ['订单数', '销量', '销售额']\ncategory_stats = category_stats.sort_values('销售额', ascending=False)\nprint(category_stats)\n\n# 3. 按地区统计\nprint('\\n3. 地区销售统计:')\nregion_stats = full_data.groupby('region').agg({\n    'order_id': 'count',\n    'total_amount': 'sum'\n}).round(2)\nregion_stats.columns = ['订单数', '销售额']\nregion_stats = region_stats.sort_values('销售额', ascending=False)\nprint(region_stats)\n\n# 4. 订单状态统计\nprint('\\n4. 订单状态统计:')\nstatus_stats = full_data['status'].value_counts()\nprint(status_stats)\n\n# 5. 关键指标汇总\nprint('\\n5. 关键指标汇总:')\nprint(f'  总订单数: {len(full_data)}')\nprint(f'  总销售额: {full_data[\"total_amount\"].sum():,.2f}')\nprint(f'  平均订单金额: {full_data[\"total_amount\"].mean():,.2f}')\nprint(f'  客户数: {full_data[\"customer_id\"].nunique()}')\nprint(f'  产品数: {full_data[\"product_id\"].nunique()}')\n\nprint('\\n' + '=' * 60)\nprint('报告结束')\nprint('=' * 60)"
       }
     ],
     practiceTasks: [
-      "1. 选择一个主题，完成完整的数据分析项目",
-      "2. 创建一个专业的项目报告",
-      "3. 准备并进行项目展示"
+      "1. 设计一个星型模式的数据仓库结构",
+      "2. 实现一个增量数据更新的逻辑",
+      "3. 处理数据冲突的解决方案"
     ],
     practiceTaskAnswers: [
-      "# 练习1答案：完整数据分析项目流程\n\n## 完整数据分析项目流程\n\n### 1. 问题定义\n- 明确业务问题和分析目标\n- 确定关键利益相关者\n- 评估项目可行性和时间计划\n\n### 2. 数据收集\n- 确定数据来源（公开数据集、公司内部数据、网络爬虫）\n- 收集所需数据\n- 了解数据结构和含义\n\n### 3. 数据清洗和预处理\n- 处理缺失值\n- 处理异常值\n- 数据类型转换\n- 去除重复数据\n\n### 4. 探索性数据分析(EDA)\n- 单变量分析\n- 双变量分析\n- 多变量分析\n- 可视化探索\n- 发现模式和洞察\n\n### 5. 特征工程\n- 特征选择\n- 特征构造\n- 特征编码\n- 特征缩放\n\n### 6. 建模和分析\n- 选择合适的算法\n- 训练模型\n- 模型评估\n- 模型优化\n- 模型解释\n\n### 7. 结果展示\n- 可视化关键发现\n- 创建数据仪表盘\n- 准备项目报告\n- 进行项目展示\n\n### 8. 业务建议\n- 基于分析结果提出 actionable insights\n- 提供具体的建议和下一步计划\n"
+      "# 练习1答案\nprint('星型模式设计:')\nprint('\\n事实表: 订单事实表')\nprint('- order_id (订单ID)')\nprint('- customer_id (客户ID)')\nprint('- product_id (产品ID)')\nprint('- date_id (日期ID)')\nprint('- quantity (数量)')\nprint('- amount (金额)')\n\nprint('\\n维度表:')\nprint('1. 客户维度: customer_id, name, level, region...')\nprint('2. 产品维度: product_id, name, category, brand...')\nprint('3. 日期维度: date_id, date, year, month, day...')\nprint('4. 地区维度: region_id, region, province, city...')",
+      "# 练习2答案\nprint('增量更新逻辑:')\nprint('1. 记录上次更新时间 (last_update_time)')\nprint('2. 从源系统只获取 last_update_time 之后的新增/修改数据')\nprint('3. 新数据：直接插入')\nprint('4. 修改数据：更新已有记录')\nprint('5. 更新 last_update_time 为当前时间')\nprint('6. 定期进行全量校验')",
+      "# 练习3答案\nprint('数据冲突解决方案:')\nprint('\\n1. 时间优先: 以最新的数据为准')\nprint('2. 来源优先: 以更可信的数据源为准')\nprint('3. 业务规则: 按预设的业务规则处理')\nprint('4. 人工审核: 复杂情况留待人工处理')\nprint('5. 数据版本: 保留所有版本，记录变更历史')"
     ],
     assessment: [
-      "1. 一个完整的数据分析项目包括哪些阶段？",
-      "2. 在项目中遇到最大的挑战是什么？你是如何解决的？"
+      "1. 数据融合的主要挑战是什么？",
+      "2. 简述事实表和维度表的区别"
     ],
     assessmentAnswers: [
-      "一个完整的数据分析项目通常包括以下阶段：\n\n1. 问题定义阶段\n   - 明确业务问题\n   - 确定分析目标\n   - 评估项目可行性\n\n2. 数据收集阶段\n   - 确定数据来源\n   - 收集所需数据\n   - 理解数据结构\n\n3. 数据清洗阶段\n   - 处理缺失值\n   - 处理异常值\n   - 数据类型转换\n\n4. 探索性分析阶段\n   - 单变量分析\n   - 双变量分析\n   - 可视化探索\n\n5. 特征工程阶段\n   - 特征选择\n   - 特征构造\n   - 特征编码\n\n6. 建模预测阶段\n   - 选择算法\n   - 训练模型\n   - 模型评估\n\n7. 结果展示阶段\n   - 可视化发现\n   - 创建报告\n   - 进行展示\n\n8. 业务应用阶段\n   - 提出建议\n   - 部署模型\n   - 监控效果",
-      "在项目中可能遇到的常见挑战：\n\n1. 数据质量问题：数据缺失、异常值、不一致等\n   解决方法：仔细的数据清洗、合理的填充策略\n\n2. 数据量不足：样本量太小，模型性能差\n   解决方法：数据增强、使用简单模型、迁移学习\n\n3. 特征选择困难：不知道哪些特征重要\n   解决方法：使用特征重要性、逐步选择、正则化\n\n4. 模型过拟合：训练好，测试差\n   解决方法：增加数据、正则化、集成学习\n\n5. 业务解释困难：模型太复杂，难以解释\n   解决方法：使用可解释模型、SHAP值、LIME方法\n\n6. 结果展示不清：不知道如何向非技术人员展示\n   解决方法：使用可视化、讲故事的方式、简洁明了的报告\n\n7. 时间管理问题：项目进度失控\n   解决方法：制定详细计划、设定里程碑、优先处理关键问题"
-    ]
+      "数据融合的主要挑战：1. 数据格式不一致 2. 数据质量差异 3. 主键冲突 4. 数据冗余 5. 实时性要求",
+      "事实表和维度表的区别：事实表存储业务度量，维度表存储描述性信息，星型模式是一个事实表连接多个维度表"
+    ],
+    dataset: {
+      filename: "project10_fusion.csv",
+      name: "项目10 - 数据融合数据",
+      size: "1.8KB",
+      desc: "多源数据融合数据，包含订单、客户、产品等多维度信息"
+    }
   }
-];
+]
