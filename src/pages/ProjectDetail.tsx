@@ -554,7 +554,7 @@ const ProjectDetail = () => {
               <CodeEditor 
                 initialCode="" 
                 examples={[{name: "示例代码", code: activeStep.code}]}
-                title={`步骤 ${activeStepIndex + 1}：${activeStep.title}`}
+                title={activeStep.title}
                 stepHints={stepHints}
               />
             </div>
