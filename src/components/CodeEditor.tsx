@@ -313,7 +313,6 @@ export default function CodeEditor({
         {/* 顶部工具栏 */}
         <div className="bg-slate-800 px-4 py-2 flex items-center border-b border-slate-700 overflow-x-auto" style={{scrollbarWidth: 'none'}}>
           <div className="flex items-center gap-3 flex-shrink-0">
-            <span className="text-sm text-slate-300 font-semibold whitespace-nowrap">{title}</span>
             {isReady && (
               <span className="flex items-center gap-1 text-xs text-green-400">
                 <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
